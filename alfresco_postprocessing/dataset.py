@@ -72,7 +72,7 @@ class AlfrescoDataset( object ):
 		else:
 			split[-1] = str( int( year ) + 1 )
 		split[-3] = variable
-		return os.path.join( os.path.dirname( self.n ) , '_'.join( split ) + '.tif' )
+		return os.path.join( os.path.dirname( self.fn ) , '_'.join( split ) + '.tif' )
 
 	# def _get_lag( self, variable, direction=-1 ):
 	# 	''' direction can be -1 for negative lag, or 1 for positive lag '''
