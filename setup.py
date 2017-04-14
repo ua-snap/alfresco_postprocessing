@@ -1,6 +1,6 @@
 from setuptools import setup
 
-dependencies_list = ['numpy','scipy','rasterio','shapely','pandas','geopandas','tinydb','ujson']
+dependencies_list = ['numpy','scipy','rasterio','shapely','pandas','geopandas','tinydb','ujson', 'seaborn']
 #scripts_list = [	'bin/alfresco_aggregate_domains_json.py', 'bin/alfresco_fire_return_interval_estimate.py', \
 #			'bin/alfresco_json_manipulation_historical.py', 'bin/alfresco_json_manipulation.py', \
 #			'bin/alfresco_modify_postprocessing_colnames_historical.py', 'bin/alfresco_modify_postprocessing_csv_names.py', \
