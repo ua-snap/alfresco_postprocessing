@@ -1,0 +1,4 @@
+NOFMO = REGULAR ALF RUN
+ALTFMO = Alternative FMPO
+RCP85 = Current FMPO
+
