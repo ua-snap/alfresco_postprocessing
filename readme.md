@@ -87,8 +87,8 @@ metrics = [ 'avg_fire_size','number_of_fires','all_fire_sizes','total_area_burne
 out = ap.to_csvs( pp_hist, metrics, output_path, suffix, observed=True )
 pp_hist.close()
 
-# * * * * * * * * experimental * * * * * * * * * * * * * * * * * * * * * * * * * *
-# # Plot
+# * * * * * * * * PLOTTING * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 # build plot objects for comparison plots
 modplot = ap.Plot( mod_json_fn, model='GISS-E2-R', scenario='rcp85' )
 obsplot = ap.Plot( obs_json_fn, model='historical', scenario='observed' )
@@ -119,5 +119,10 @@ queried_json = db.search(User.replicate == '99')
 
 # dump to the screen to prove it worked it is a list of dicts
 print queried_json
+
+# a way to get to all the records of the database as a list, which makes working with the data
+# much easier, this will do it
+records = pp.all()
 ```
+
 
