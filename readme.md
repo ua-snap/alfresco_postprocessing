@@ -2,7 +2,7 @@
 --------------------------
 **version 3.1** Experimental Version
 
-**Python Module for calculating summary statistics across the Geospatial Raster (GeoTiff) outputs from the ALFRESCO Fire Dynamics Model [snap.uaf.edu](www.snap.uaf.edu)**
+**Python Module for calculating summary statistics across the Geospatial Raster (GeoTiff) outputs from the ALFRESCO Fire Dynamics Model [snap.uaf.edu](http://www.snap.uaf.edu)**
 
 
 #### ALFRESCO output data descriptions:
