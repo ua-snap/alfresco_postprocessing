@@ -14,7 +14,7 @@ name_field = 'Name'
 output_path = '/atlas_scratch/malindgren/TEST_WINSLOW'
 mod_json_fn = os.path.join( output_path, 'ALF_TEST.json' )
 obs_json_fn = os.path.join( output_path, 'OBS_TEST.json' )
-suffix = 'GISS-E2-R_rcp85_NoFMO' # some id for the output csvs --needs changing
+suffix = 'GISS-E2-R_rcp85_NoFMO' # some id for the output csvs
 metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned' ]
 
 # # PostProcess
@@ -39,8 +39,6 @@ pp_hist.close()
 # build a plot object
 modplot = ap.Plot( mod_json_fn, model='GISS-E2-R', scenario='rcp85' )
 obsplot = ap.Plot( obs_json_fn, model='historical', scenario='observed' )
-
-#**** obsplot needs to have the Plot command updated to work with ONLY fire_year variable...
 
 # annual area burned barplot
 replicate = 0

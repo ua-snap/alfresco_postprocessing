@@ -104,25 +104,25 @@ ap.vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(1950
 ap.aab_lineplot_factory( modplot, obsplot, output_path, model, scenario, replicates=[None], year_range=(1950, 2100) )
 
 ```
-the new object generated above named `pp` is a [TinyDB](https://tinydb.readthedocs.org/en/latest/) database, which sorts the data in a JSON file on disk, but allows for simple querying if desired by the end user.  Currently, we are using this internally as a simple and straightforward way to store the output data as json records which minimizes somewhat painful nesting utilized in older versions.
+the new `Plot` object generated above named `pp` contains a [TinyDB](https://tinydb.readthedocs.org/en/latest/) database as an attribute `db`, which sorts the data in a JSON file on disk, but allows for simple querying if desired by the end user.  Currently, we are using this internally as a simple and straightforward way to store the output data as json records which minimizes somewhat painful nesting utilized in older versions.
 
 
 A Query example would look something like this:
 ```python
 # using data from above in continuation
 # how many records are in it?
-len( pp )
+len( pp.db )
 
 # query a specific replicates values
 User = Query()
-queried_json = db.search(User.replicate == '99')
+queried_json = pp.db.search(User.replicate == '99')
 
 # dump to the screen to prove it worked it is a list of dicts
 print queried_json
 
 # a way to get to all the records of the database as a list, which makes working with the data
 # much easier, this will do it
-records = pp.all()
+records = pp.db.all()
 ```
 
 
