@@ -43,54 +43,66 @@ for more localized summary statistics results.
 external package dependencies:
 rasterio requires: `gdal` library development bindings for your system.
 
-
-standard python package installation:
-
 ```bash
-git clone git@github.com:ua-snap/alfresco-calibration.git
-cd alfresco-calibration/
-git checkout alfresco-postprocessing # currently the devel branch
-cd alfresco_postprocessing/
-python setup.py install
+# make sure that NumPy is installed first due to some dependency weirdness
+pip install numpy
+pip install git+https://github.com/ua-snap/alfresco-postprocessing/tree/alfresco_postprocessing
 ```
-
-or the super-simple `pip` way:
-```bash
-pip install git+https://github.com/ua-snap/alfresco-calibration/tree/alfresco-postprocessing/alfresco_postprocessing
-```
-
-It is hightly reccomended to install python *without* `sudo`.  A very simple way of doing this (ymmv) is highlighted [here](https://github.com/EarthScientist/etc/blob/master/Python_without_root "EarthScientist's ETC repo"). 
-
 
 #### Basic Usage:
 
 once installed package use looks something like this:
 
 ```python
-
-# import library
 import alfresco_postprocessing as ap
-from tinydb import TinyDB, Query
+import os
 
-# input args
+# # input args
 ncores = 32
-maps_path = './Maps'
-subdomains_fn = './subdomains.shp'
-id_field = 'ID'
+maps_path = './Maps' # alfresco output maps dir
+historical_maps_path = './FireHistory'
+subdomains_fn = './Domains/AOI_SERDP.shp'
+id_field = 'OBJECTID_1'
 name_field = 'Name'
-out_json_fn = './output.json'
+output_path = './ALFRESCO_PP'
+mod_json_fn = os.path.join( output_path, 'ALF.json' )
+obs_json_fn = os.path.join( output_path, 'OBS.json' )
+suffix = 'ModelName_scenario' # some id for the output csvs
 metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned' ]
 
-# PostProcess using shapefile-derived rasterized subdomains.
-pp = ap.run_postprocessing( maps_path, out_json_fn, ncores, subdomains_fn, id_field, name_field )
+# # PostProcess
+# alfresco output gtiffs
+pp = ap.run_postprocessing( maps_path, mod_json_fn, ncores, ap.veg_name_dict, subdomains_fn, id_field, name_field )
 
-# Output to CSV files for researcher ease-of-use
-suffix = 'model_name' # some id for the output csvs
-output_path = './output_csvs'
-_ = ap.to_csvs( pp, metrics, output_path, suffix )
+# historical fire input gtiffs
+pp_hist = ap.run_postprocessing_historical( historical_maps_path, obs_json_fn, ncores, ap.veg_name_dict, subdomains_fn, id_field, name_field)
 
-# close the database
-pp.close() 
+# # CSVs
+# modeled
+out = ap.to_csvs( pp, metrics, output_path, suffix, observed=False )
+pp.close() # close the database
+
+# historical
+metrics = [ 'avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned' ]
+out = ap.to_csvs( pp_hist, metrics, output_path, suffix, observed=True )
+pp_hist.close()
+
+# * * * * * * * * experimental * * * * * * * * * * * * * * * * * * * * * * * * * *
+# # Plot
+# build plot objects for comparison plots
+modplot = ap.Plot( mod_json_fn, model='GISS-E2-R', scenario='rcp85' )
+obsplot = ap.Plot( obs_json_fn, model='historical', scenario='observed' )
+
+# annual area burned barplot
+replicate = 0
+ap.aab_barplot_factory( modplot, obsplot, output_path, replicate, year_range=(1950, 2010) )
+
+# veg counts lineplots
+ap.vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(1950, 2100))
+
+# annual area burned lineplots
+ap.aab_lineplot_factory( modplot, obsplot, output_path, model, scenario, replicates=[None], year_range=(1950, 2100) )
+
 ```
 the new object generated above named `pp` is a [TinyDB](https://tinydb.readthedocs.org/en/latest/) database, which sorts the data in a JSON file on disk, but allows for simple querying if desired by the end user.  Currently, we are using this internally as a simple and straightforward way to store the output data as json records which minimizes somewhat painful nesting utilized in older versions.
 
@@ -108,9 +120,4 @@ queried_json = db.search(User.replicate == '99')
 # dump to the screen to prove it worked it is a list of dicts
 print queried_json
 ```
-
-#### Docs
-very new and not complete.
-
-There is simple [documentation](http://ua-snap.github.io/alfresco-calibration) which is auto-generated and not nearly complete, but evolving daily. Any help with documentation is more than welcomed and appreciated.  :)
 

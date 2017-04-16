@@ -1,9 +1,7 @@
 # * * * * * * * * * * * * * * * * * * * * * * * * * * *
 # ALFRESCO POST-PROCESSING EXAMPLE -- SNAP
 # * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
 import alfresco_postprocessing as ap
-from tinydb import TinyDB, Query
 import os
 
 # # input args
@@ -45,12 +43,14 @@ obsplot = ap.Plot( obs_json_fn, model='historical', scenario='observed' )
 #**** obsplot needs to have the Plot command updated to work with ONLY fire_year variable...
 
 # annual area burned barplot
-_ = aab_barplot_factory( modplot, obsplot, output_path, replicate, year_range )
-aab_barplot_factory( modplot, obsplot, output_path, replicate, year_range=(1950, 2010) )
+replicate = 0
+ap.aab_barplot_factory( modplot, obsplot, output_path, replicate, year_range=(1950, 2010) )
 
+# veg counts lineplots
+ap.vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(1950, 2100))
 
-
-
+# annual area burned lineplots
+ap.aab_lineplot_factory( modplot, obsplot, output_path, model, scenario, replicates=[None], year_range=(1950, 2100) )
 
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
