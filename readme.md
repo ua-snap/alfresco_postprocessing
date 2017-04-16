@@ -1,6 +1,6 @@
 ## ALFRESCO Post-Processing
 --------------------------
-**version 3.1** Experimental Version
+**version 3.1**
 
 **Python Module for calculating summary statistics across the Geospatial Raster (GeoTiff) outputs from the [ALFRESCO Fire Dynamics Model](https://www.snap.uaf.edu/projects/alfresco-habitat)**
 
@@ -125,4 +125,4 @@ print queried_json
 records = pp.db.all()
 ```
 
-
+# TODO: add information about CLI binaries that are distributed with this package for relative veg, flammability, and more.
