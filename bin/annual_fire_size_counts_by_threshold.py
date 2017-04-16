@@ -26,7 +26,6 @@ def count_fire_sizes_annual( fn, threshold=4 ):
 	from tinydb import TinyDB
 	import pandas as pd
 	import numpy as np
-	from collections import defaultdict
 	
 	# open the TinyDB output and make a list of the records
 	dat = TinyDB( fn ).all()
@@ -61,16 +60,15 @@ def count_fire_sizes_annual( fn, threshold=4 ):
 	return dd
 
 if __name__ == '__main__':
-	import os
-	import argparse
-
+	import os, argparse
+	
 	parser = argparse.ArgumentParser( description='calculate number of fires with sizes above and below a given integer threshold. output as CSV(s)' )
 	parser.add_argument( '-output_path', '--output_path', action='store', dest='output_path', type=str, help='path to output directory to dump csvs' )
 	parser.add_argument( '-fn', '--fn', action='store', dest='fn', type=str, help='path to alfresco_postprocessing generated summary JSON' )
 	parser.add_argument( '-t', '--threshold', action='store', dest='threshold', const=4, type=int, help='threshold value in number of pixels' )
 	args = parser.parse_args()
 	
-	# unpack the args... this is tedious but easier
+	# unpack the args... this is tedious but easier when testing.
 	fn = args.fn
 	output_path = args.output_path
 	threshold = args.threshold
