@@ -29,7 +29,7 @@ class Plot( object ):
 		self.scenario = scenario
 		self.fire_years = self._get_fire_years()
 
-		if model != 'historical' and scenario != 'observed':
+		if 'av_year' in self.records[0].keys():
 			self.av_years = self._get_av_years()
 		
 		self.replicates = self._get_replicates()
