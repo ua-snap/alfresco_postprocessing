@@ -125,4 +125,25 @@ print queried_json
 records = pp.db.all()
 ```
 
+It is also useful to compute 'best replicates', which is not easy given the close relationship of each of the future realizations (replicates), but a simple and way that is rife with problems is to do the following:
+
+```python
+
+if __name__ == '__main__':
+	from alfresco_postprocessing import *
+	import os
+
+	# alfpp generated json files
+	modeled_json = 'alf.json'
+	observed_json = 'obs.json'
+
+	# plot objects:
+	modplot = Plot( modeled_json, 'model', 'scenario' )
+	obsplot = Plot( observed_json, 'model', 'scenario' )
+
+	# calc best rep -- returns:{ replicate:correlation value }
+	best_rep( modplot, obsplot, domain, method='spearman' )
+
+```
+
 # TODO: add information about CLI binaries that are distributed with this package for relative veg, flammability, and more.
