@@ -31,7 +31,7 @@ band descriptions:
 	2.) identifies each fire patch with a unique integer value patch count begins at 1.
 	3.) boolean value (0,1) where a fire's ignition point is 1.
 ```
-* BurnSeverity - [not yet supported]
+* BurnSeverity - Burn severity levels for each fire patch in an ALFRESCO Output FireScar file.
 
 * BasalArea - [not yet supported]
 
@@ -68,7 +68,7 @@ output_path = './ALFRESCO_PP'
 mod_json_fn = os.path.join( output_path, 'ALF.json' )
 obs_json_fn = os.path.join( output_path, 'OBS.json' )
 suffix = 'ModelName_scenario' # some id for the output csvs
-metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned' ]
+metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned', 'severity_counts' ]
 
 # # PostProcess
 # alfresco output gtiffs
