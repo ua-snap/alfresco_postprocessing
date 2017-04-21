@@ -159,7 +159,7 @@ class BurnSeverity( object ):
 		Arguments:
 		----------
 		alf_ds = (AlfrescoDataset) an object of type AlfrescoDataset which contains
-				all needed attributes to run the fire metrics.
+				all needed attributes to run the burn_severity metrics.
 
 		returns:
 		--------
@@ -178,5 +178,5 @@ class BurnSeverity( object ):
 		raster_arr = self.alf_ds.raster_arr
 		return { self.alf_ds.sub_domains.names_dict[domain_num]:\
 					dict( zip( *np.unique( raster_arr[ (domain == domain_num) & (raster_arr > 0) & (raster_arr != 255) ], return_counts=True ) ) ) \
-					for domain_num, domain in domains } # changed (raster_arr > 0) from (raster_arr >= 0)  WATCH IT!
+					for domain_num, domain in domains }
 
