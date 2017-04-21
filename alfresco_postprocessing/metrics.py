@@ -177,6 +177,6 @@ class BurnSeverity( object ):
 		domains = [ (np.unique( domain[domain > 0] )[0], domain) for domain in domains ]
 		raster_arr = self.alf_ds.raster_arr
 		return { self.alf_ds.sub_domains.names_dict[domain_num]:\
-					dict( zip( *np.unique( raster_arr[ (domain == domain_num) & (raster_arr > 0) ], return_counts=True ) ) ) \
+					dict( zip( *np.unique( raster_arr[ (domain == domain_num) & (raster_arr > 0) & (raster_arr != 255) ], return_counts=True ) ) ) \
 					for domain_num, domain in domains } # changed (raster_arr > 0) from (raster_arr >= 0)  WATCH IT!
 
