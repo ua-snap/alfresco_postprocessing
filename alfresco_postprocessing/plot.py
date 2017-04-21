@@ -1,3 +1,5 @@
+import matplotlib # order is important here
+matplotlib.use( 'Agg' ) # order is important here
 import pandas as pd
 import numpy as np
 import alfresco_postprocessing as ap
@@ -142,7 +144,7 @@ def aab_barplot( modeled_rep, observed, output_path, domain, replicate, model, s
 	import matplotlib, os
 	matplotlib.use('Agg')
 	from matplotlib import pyplot as plt
-	import seaborn as sns
+	# import seaborn as sns
 
 	# combine modeled and historical
 	df = pd.concat( [observed, modeled_rep], axis=1 )
@@ -208,7 +210,7 @@ def vegcounts_lineplot( modeled, output_path, domain, model, scenario, vegtype, 
 	import matplotlib, os
 	matplotlib.use('Agg')
 	from matplotlib import pyplot as plt
-	import seaborn as sns
+	# import seaborn as sns
 	import matplotlib.pyplot as plt
 	import matplotlib.patches as mpatches
 
@@ -283,7 +285,7 @@ def aab_lineplot( modeled, observed, output_path, domain, model, scenario, repli
 	import matplotlib, os
 	matplotlib.use('Agg')
 	from matplotlib import pyplot as plt
-	import seaborn as sns
+	# import seaborn as sns
 	import matplotlib.pyplot as plt
 	import matplotlib.patches as mpatches
 
@@ -367,7 +369,7 @@ def cab_lineplot( modeled, observed, output_path, domain, model, scenario, repli
 	import matplotlib, os
 	matplotlib.use('Agg')
 	from matplotlib import pyplot as plt
-	import seaborn as sns
+	# import seaborn as sns
 	import matplotlib.pyplot as plt
 	import matplotlib.patches as mpatches
 
@@ -448,7 +450,7 @@ def cab_vs_fs_lineplot( modeled, observed, output_path, domain, model, scenario,
 	import matplotlib, os
 	matplotlib.use('Agg')
 	from matplotlib import pyplot as plt
-	import seaborn as sns
+	# import seaborn as sns
 	import matplotlib.pyplot as plt
 	import matplotlib.patches as mpatches
 
