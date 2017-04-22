@@ -411,7 +411,7 @@ def metric_to_csvs( db, metric_name, output_path, suffix=None ):
 			else:
 				output_filename = os.path.join( output_path, '_'.join([ 'alfresco', metric_name.replace('_',''), domain,\
 													suffix, startyear, endyear ]) + '.csv' )
-			df.to_csv( output_filename, sep=',' )
+			df.to_csv( output_filename, sep=',', index_label=('replicate','year') )
 
 	return 1
 
