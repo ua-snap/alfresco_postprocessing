@@ -367,7 +367,7 @@ def metric_to_csvs( db, metric_name, output_path, suffix=None ):
 	endyear = max(years)
 
 	for domain in domains:
-		if metric_name != 'veg_counts': # fire
+		if metric_name not in ['veg_counts', 'severity_counts']: # firescar
 			if suffix == None:
 				output_filename = os.path.join( output_path, '_'.join([ 'alfresco', metric_name.replace('_',''), domain,\
 													startyear, endyear ]) + '.csv' )
@@ -381,7 +381,7 @@ def metric_to_csvs( db, metric_name, output_path, suffix=None ):
 			panel_select.columns = column_order_names
 			panel_select.to_csv( output_filename, sep=',' )
 
-		if metric_name == 'veg_counts': # veg
+		elif metric_name == 'veg_counts': # veg
 			df = panel[ :, domain, : ]
 			vegtypes = sorted( df.ix[0,0].keys() )
 			new_panel = pd.Panel( df.to_dict() )
@@ -401,6 +401,18 @@ def metric_to_csvs( db, metric_name, output_path, suffix=None ):
 				# deal with NaN's? !
 				veg_df.fillna( 0 )
 				veg_df.to_csv( output_filename, sep=',' )
+
+		elif metric_name == 'severity_counts':
+			burnseverity = { (rec[ 'replicate' ],rec[ 'fire_year' ]):pd.Series(rec[ 'severity_counts' ][ domain ]) for rec in db.all() }
+			df = pd.concat( burnseverity ).astype( int ).unstack().fillna( 0 )
+			if suffix == None:
+				output_filename = os.path.join( output_path, '_'.join([ 'alfresco', metric_name.replace('_',''), domain,\
+													startyear, endyear ]) + '.csv' )
+			else:
+				output_filename = os.path.join( output_path, '_'.join([ 'alfresco', metric_name.replace('_',''), domain,\
+													suffix, startyear, endyear ]) + '.csv' )
+			df.to_csv( output_filename, sep=',' )
+
 	return 1
 
 
