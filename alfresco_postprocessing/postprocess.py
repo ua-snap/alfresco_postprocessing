@@ -404,7 +404,7 @@ def metric_to_csvs( db, metric_name, output_path, suffix=None ):
 
 		elif metric_name == 'severity_counts':
 			burnseverity = { (rec[ 'replicate' ],rec[ 'fire_year' ]):pd.Series(rec[ 'severity_counts' ][ domain ]) for rec in db.all() }
-			df = pd.concat( burnseverity ).astype( int ).unstack().fillna( 0 )
+			df = pd.concat( burnseverity ).astype( int ).unstack().fillna( 0 ).astype( int )
 			if suffix == None:
 				output_filename = os.path.join( output_path, '_'.join([ 'alfresco', metric_name.replace('_',''), domain,\
 													startyear, endyear ]) + '.csv' )
