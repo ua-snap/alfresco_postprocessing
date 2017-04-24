@@ -48,13 +48,5 @@ ap.aab_barplot_factory( modplot, obsplot, output_path, replicate, year_range=(19
 ap.vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(1950, 2100))
 
 # annual area burned lineplots
-ap.aab_lineplot_factory( modplot, obsplot, output_path, model, scenario, replicates=[None], year_range=(1950, 2100) )
+ap.aab_lineplot_factory( modplot, obsplot, output_path, replicates=[None], year_range=(1950, 2100) )
 
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-# test DIRECTORIES and junk.  temporary.
-# maps_path = '/atlas_scratch/apbennett/IEM/FinalCalib/cccma_cgcm3_1.sresa1b/Maps'
-# maps_path = '/atlas_scratch/malindgren/sort_maps_path/cccma_cgcm3_1.sresa1b/Maps'
-#'/workspace/Shared/Users/jschroder/ALFRESCO_SERDP/Data/Domains/newfmo.shp' 
-# '/atlas_scratch/malindgren/test_stuff/raster_subdomains_test.tif' 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
