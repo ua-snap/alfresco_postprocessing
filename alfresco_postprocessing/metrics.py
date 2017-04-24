@@ -144,3 +144,39 @@ class VegFire( object ):
 					for domain_num, domain in domains } # changed (raster_arr > 0) from (raster_arr >= 0)  WATCH IT!
 
 
+class BurnSeverity( object ):
+	'''
+	[ experimental ]
+	calculate BurnSeverity metrics from ALFRESCO Fire Dynamics Model 
+	output rasters across subdomains if applicable.
+	'''
+	def __init__( self, alf_ds, **kwargs ):
+		'''
+		initialize BurnSeverity data and calculate metrics
+
+		severity_counts = counts of unique burn severity levels in a given subdomain
+
+		Arguments:
+		----------
+		alf_ds = (AlfrescoDataset) an object of type AlfrescoDataset which contains
+				all needed attributes to run the burn_severity metrics.
+
+		returns:
+		--------
+		object of class AlfrescoFire containing attributes calculated over the raster
+		and potentially the subdomains in that area of interest.
+
+		'''
+		self.alf_ds = alf_ds
+		self.severity_counts = self._unique_counts_domains( )
+
+	def _total_area_burned( self, *args, **kwargs ):
+		return { i:np.sum( self.fire_counts[ i ].values() ) for i in self.fire_counts.keys() }
+	def _unique_counts_domains( self ):
+		domains = self.alf_ds.sub_domains.sub_domains
+		domains = [ (np.unique( domain[domain > 0] )[0], domain) for domain in domains ]
+		raster_arr = self.alf_ds.raster_arr
+		return { self.alf_ds.sub_domains.names_dict[domain_num]:\
+					dict( zip( *np.unique( raster_arr[ (domain == domain_num) & (raster_arr > 0) & (raster_arr != 255) ], return_counts=True ) ) ) \
+					for domain_num, domain in domains }
+

@@ -11,11 +11,11 @@ historical_maps_path = '/Data/Base_Data/ALFRESCO/ALFRESCO_Master_Dataset/ALFRESC
 subdomains_fn = '/workspace/Shared/Users/jschroder/ALFRESCO_SERDP/Data/Domains/AOI_SERDP.shp'
 id_field = 'OBJECTID_1'
 name_field = 'Name'
-output_path = '/atlas_scratch/malindgren/TEST_WINSLOW'
+output_path = '/atlas_scratch/malindgren/TEST_BURNSEVERITY'
 mod_json_fn = os.path.join( output_path, 'ALF_TEST.json' )
 obs_json_fn = os.path.join( output_path, 'OBS_TEST.json' )
 suffix = 'GISS-E2-R_rcp85_NoFMO' # some id for the output csvs
-metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned' ]
+metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned','severity_counts' ]
 
 # # PostProcess
 # alfresco output gtiffs

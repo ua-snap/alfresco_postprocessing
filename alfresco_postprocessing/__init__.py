@@ -151,6 +151,7 @@ def _run_timestep( timestep, sub_domains, veg_name_dict, *args, **kwargs ):
 	ds_fs = ap.open( timestep.FireScar.fn, sub_domains=sub_domains )
 	ds_veg = ap.open( timestep.Veg.fn, sub_domains=sub_domains )
 	# ds_age = ap.open( timestep.Age.fn, sub_domains=sub_domains )
+	ds_burnseverity = ap.open( timestep.BurnSeverity.fn, sub_domains=sub_domains )
 	
 	out_dd = {}
 	# fire 
@@ -167,6 +168,9 @@ def _run_timestep( timestep, sub_domains, veg_name_dict, *args, **kwargs ):
 
 	# age -- not yet implemented
 	# age = Age()
+
+	burnseverity = BurnSeverity( ds_burnseverity )
+	out_dd.update( severity_counts=burnseverity.severity_counts )
 	return out_dd
 
 def _get_stats( timesteps, db, sub_domains, ncores, veg_name_dict ):
