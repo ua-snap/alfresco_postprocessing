@@ -141,8 +141,7 @@ def aab_barplot( modeled_rep, observed, output_path, domain, replicate, model, s
 
 	'''
 	# order of imports is important here if using 'Agg'
-	import matplotlib, os
-	matplotlib.use('Agg')
+	import os
 	from matplotlib import pyplot as plt
 	# import seaborn as sns
 
@@ -207,8 +206,7 @@ def vegcounts_lineplot( modeled, output_path, domain, model, scenario, vegtype, 
 
 	'''
 	# order of imports is important here if using 'Agg'
-	import matplotlib, os
-	matplotlib.use('Agg')
+	import os
 	from matplotlib import pyplot as plt
 	# import seaborn as sns
 	import matplotlib.pyplot as plt
@@ -282,8 +280,7 @@ def aab_lineplot( modeled, observed, output_path, domain, model, scenario, repli
 	function to build the needed output plot for the cumulative area burned calibration plot
 	'''
 	# order of imports is important here if using 'Agg'
-	import matplotlib, os
-	matplotlib.use('Agg')
+	import os
 	from matplotlib import pyplot as plt
 	# import seaborn as sns
 	import matplotlib.pyplot as plt
@@ -366,8 +363,7 @@ def cab_lineplot( modeled, observed, output_path, domain, model, scenario, repli
 	function to build the needed output plot for the cumulative area burned calibration plot
 	'''
 	# order of imports is important here if using 'Agg'
-	import matplotlib, os
-	matplotlib.use('Agg')
+	import os
 	from matplotlib import pyplot as plt
 	# import seaborn as sns
 	import matplotlib.pyplot as plt
