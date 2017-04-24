@@ -385,8 +385,6 @@ def cab_lineplot( modeled, observed, output_path, domain, model, scenario, repli
 	sns.set_style( 'whitegrid', {'ytick.major.size': 7, 'xtick.major.size': 7} )
 	my_colors = [ 'black', 'DarkRed' ]
 
-	# plot_title = 'ALFRESCO Cumulative Area Burned %d-%d \n %s \n %s' \
-	# 			% ( begin, end, model + ' ' + scenario, domain )
 	plot_title = 'ALFRESCO Cumulative Sum of Annual Area Burned %d-%d \n %s \n %s' \
 		% ( begin, end, model.upper().replace( '_', ' ' ) + ' - ' + scenario.upper(), domain )
 
