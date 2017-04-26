@@ -46,7 +46,7 @@ rasterio requires: `gdal` library development bindings for your system.
 ```bash
 # make sure that NumPy is installed first due to some dependency weirdness
 pip install numpy
-pip install git+https://github.com/ua-snap/alfresco_postprocessing
+pip install --upgrade git+git://github.com/ua-snap/alfresco_postprocessing@master
 ```
 
 #### Basic Usage:
