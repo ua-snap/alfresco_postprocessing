@@ -77,7 +77,7 @@ def sum_firescars( firescar_list, ncores ):
 		_ = pool.apply_async( prep_firescar, (fn,), callback=sum_arr.add )
 
 	pool.close()
-	pool.join() #waits for all the processes to finish
+	pool.join()
 
 	return sum_arr.value
 
@@ -157,5 +157,13 @@ if __name__ == '__main__':
 		mask = rasterio.open( args.mask )
 
 	firescar_list = list_files( maps_path, wildcard='FireScar_' )
-	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=ncores, mask_arr=mask.read(1), mask_value=-9999, crs={'init':'epsg:3338'} )
+	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=ncores, crs={'init':'epsg:3338'} ) # mask_arr=mask.read(1), mask_value=-9999
 	print( 'completed: %s' % output_filename )
+
+
+
+# # TEST
+# maps_path = '/workspace/Shared/Users/malindgren/SERDP/test_fire'
+# output_filename = '/workspace/Shared/Users/malindgren/ALFRESCO/relative_flammability_test_async.tif'
+# ncores = 64
+# # ENDTEST
