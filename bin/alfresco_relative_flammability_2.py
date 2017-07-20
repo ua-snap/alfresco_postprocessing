@@ -1,40 +1,10 @@
 import numpy as np
 import pandas as pd
-# import multiprocessing
-from pathos import multiprocessing
 import rasterio
-
-class FireSum:
-	'''
-	simple class to sum prepared firescar outputs to boolean. where fire=1, nofire=0
-	in a rolling manner using multiprocessing and callbacks.
-	The only needed input is a numpy 2-D array that will be used as a template to 
-	'zero-out' the rolling sum.  multiprocessing Lock() is used to ensure access to
-	the add method is performed by only one worker at a time.  This is performed to 
-	reduce the RAM overhead of summation across the entire range of outputs using 
-	numpy and multiprocessing map(). 
-	Arguments:
-		arr = [numpy.ndarray] with 2 dimensions in the order of (lat, lon)
-	
-	Returns:
-		FireSum() object with zeroed-out template of arr
-	'''
-	def __init__( self, arr ):
-		self.value = np.zeros_like( arr ) #this is the initialization of the sum
-		self.lock = multiprocessing.Lock()
-		self.count = 0
-		
-	def add( self, value ):
-		self.count += 1
-		self.lock.acquire() #lock so sum is correct if two processes return at same time
-		self.value += value #the actual summation
-		self.lock.release()
-
-def prep_firescar( fn ):
-	import rasterio
-	array1 = rasterio.open( fn ).read( 3 )
-	array1 = np.where( array1 > -2147483647, 1, 0 )
-	return array1
+try:
+	from pathos import multiprocessing
+except:
+	import multiprocessing
 
 def get_repnum( fn ):
 	''' 
@@ -43,37 +13,30 @@ def get_repnum( fn ):
 	'''
 	return os.path.basename( fn ).split( '_' )[-2]
 
+def read_raster_band( fn, band ):
+	''' cleanly open and read a band from a raster fn '''
+	with rasterio.open( fn ) as rst:
+		arr = rst.read( band )
+	return arr
+
+def prep_firescar( fn ):
+	import rasterio
+	arr = read_raster_band( fn, band=3 )
+	arr = np.where( arr > -2147483647, 1, 0 )
+	return arr
+
 def sum_firescars( firescar_list, ncores ):
 	pool = multiprocessing.Pool( processes=ncores, maxtasksperchild=2 )
-
-	# tmp_rst = rasterio.open( firescar_list[0] )
-	# tmp_arr = tmp_rst.read( 3 )
-
 	# groupby the replicate number
 	firescar_series = pd.Series( firescar_list )
 	repgrouper = firescar_series.apply( get_repnum )
 	firescar_groups = [ j.tolist() for i,j in firescar_series.groupby( repgrouper ) ]
 
-	repsums = [ np.sum( pool.map( lambda fn: rasterio.open( fn ).read( 3 ), group ), axis=0 ) for group in firescar_groups ]
+	repsums = [ np.sum( pool.map( lambda fn: prep_firescar(fn), group ), axis=0 ) 
+					for group in firescar_groups ]
+
 	pool.close()
-	sum_arr = np.sum( repsums, axis=0 )
-	return sum_arr
-
-def sum_firescars2( firescar_list, ncores ):
-	''' HUUUGE RAM HOG, but very fast. '''
-	pool = multiprocessing.Pool( processes=ncores, maxtasksperchild=2 )
-
-	# groupby the replicate number
-	firescar_series = pd.Series( firescar_list )
-	repgrouper = firescar_series.apply( get_repnum )
-	firescar_groups = [ j.tolist() for i,j in firescar_series.groupby( repgrouper ) ]
-
-	def run( group ):
-		return np.sum( [ rasterio.open( fn ).read( 3 ) for fn in group ], axis=0 )
-
-	repsums = pool.map( run, firescar_groups )
-	# repsums = [ pool.map( lambda fn: np.sum( [ rasterio.open( fn ).read( 3 ), group ), axis=0 ) for group in firescar_groups ]
-	pool.close()
+	pool.join()
 	sum_arr = np.sum( repsums, axis=0 )
 	return sum_arr
 
@@ -106,7 +69,7 @@ def relative_flammability( firescar_list, output_filename, ncores=None, mask_arr
 	out = sum_firescars( firescar_list, ncores=ncores )
 
 	# calculate the relative flammability
-	relative_flammability = ( out / len( firescar_list ) )
+	relative_flammability = ( out / float( len( firescar_list ) ) )
 
 	if mask_value == None:
 		mask_value = tmp_rst.nodata
@@ -140,7 +103,7 @@ if __name__ == '__main__':
 	maps_path = '/workspace/Shared/Users/malindgren/SERDP/test_fire'
 
 	# output filename
-	output_filename = '/workspace/Shared/Users/malindgren/SERDP/test_fire/output/relative_flammability_test_async.tif'
+	output_filename = '/workspace/Shared/Users/malindgren/ALFRESCO/relative_flammability_test_async.tif'
 
 	# list the rasters we are going to use here
 	firescar_list = glob.glob( os.path.join( maps_path, 'Fire*.tif' ) )
@@ -149,7 +112,7 @@ if __name__ == '__main__':
 	# firescar_list = [ i for i in firescar_list for j in range( 25 ) ]
 
 	# run relative flammability
-	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=32, mask_arr=None, mask_value=None, crs={'init':'epsg:3338'} )
+	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=50, mask_arr=None, mask_value=None, crs={'init':'epsg:3338'} )
 
 
 
