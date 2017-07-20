@@ -141,21 +141,12 @@ if __name__ == '__main__':
 	# if args.mask:
 	# 	mask = rasterio.open( args.mask )
 
-	# # input path
-	# maps_path = '/atlas_scratch/apbennett/IEM_AR5/NCAR-CCSM4_rcp45/Maps'
-	# # maps_path = '/workspace/Shared/Users/malindgren/SERDP/test_fire'
-	# # model = 'CCSM4'
-	# # scenario = 'rcp45'
-	# # output_path = os.path.join( '/atlas_scratch/malindgren/ALFRESCO_IEM_DERIVED_DEC2016', model, 'relative_flammability' )
-	# # output_filename = os.path.join( output_path, 'alfresco_relative_flammability_' + model + '_' + scenario + '_' + str(1901) + '_' + str(2100) + '.tif' )
-	# output_filename = '/workspace/Shared/Users/malindgren/ALFRESCO/relative_flammability_test_async.tif'
-
 	# list the rasters we are going to use here
 	firescar_list = [ os.path.join( root, fn ) for root, subs, files in os.walk( maps_path ) 
 							for fn in files if 'FireScar_' in fn and fn.endswith('.tif') ]
 
 	# run relative flammability
-	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=50, mask_arr=None, mask_value=None, crs={'init':'epsg:3338'} )
+	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=ncores, mask_arr=None, mask_value=None, crs={'init':'epsg:3338'} )
 
 
 # # # TESTING # # # 

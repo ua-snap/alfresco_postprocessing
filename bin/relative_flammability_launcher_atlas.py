@@ -24,5 +24,5 @@ for maps_path, output_filename in zip( maps_paths, output_filenames ):
 		# change dir to the alf_pp bin dir
 		os.chdir( alfbin_path )
 		command = 'python alfresco_relative_flammability.py -p ' + maps_path + ' -o ' + output_filename + ' -nc ' + str( ncores ) # + ' -m ' + mask_fn
-		f.writelines( ("#!/bin/sh\n#SBATCH --ntasks={}\n#SBATCH --nodes=1\n#SBATCH --ntasks-per-node={}\n#SBATCH --account=snap\n#SBATCH --mail-type=all\n#SBATCH --mail-user=malindgren@alaska.edu\n#SBATCH -p main\n\n" + command + '\n').format(ncores) )
+		f.writelines( ("#!/bin/sh\n#SBATCH --ntasks={}\n#SBATCH --nodes=1\n#SBATCH --ntasks-per-node={}\n#SBATCH --account=snap\n#SBATCH --mail-type=all\n#SBATCH --mail-user=malindgren@alaska.edu\n#SBATCH -p main\n\n" + command + '\n').format(ncores, ncores) )
 	os.system( 'sbatch '+ slurm_file )
