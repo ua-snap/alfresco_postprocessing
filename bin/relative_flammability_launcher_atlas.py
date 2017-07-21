@@ -26,7 +26,7 @@ if __name__ == '__main__':
 	output_path = '/atlas_scratch/jschroder/ALF_outputs/PP_2017-07-19-09-03_all_polygons/relative_flammability'
 	mask_fn = None
 	sub_dirs = [ i for i in glob.glob(base_path+'/*') if 'Plot' not in i and 'Core' not in i and os.path.isdir(i) ] # drop unneeded folders...
-	ncores = 32
+	ncores = 10
 
 	maps_paths = [ os.path.join( base_path, i, 'Maps' ) for i in sub_dirs ]
 	output_filenames = [ os.path.join( output_path, 'alfresco_relative_flammability_'+os.path.basename(sub)+'.tif' ) for sub in sub_dirs ]
@@ -39,5 +39,4 @@ if __name__ == '__main__':
 			os.makedirs( slurm_path )
 
 		slurm_file = os.path.join( slurm_path, 'slurm_run_{}.slurm'.format(maps_path.split(os.path.sep)[-2]) )
-				
 		run_model( slurm_file, maps_path, output_filename, ncores )
