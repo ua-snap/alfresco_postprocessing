@@ -98,7 +98,7 @@ def relative_flammability( firescar_list, output_filename, ncores=None, mask_arr
 			print( 'setting mask_value to -9999')
 			mask_value = -9999
 
-	if mask_arr:
+	if mask_arr is not None:
 		relative_flammability[ mask_arr == 0 ] = mask_value
 
 	meta = tmp_rst.meta
@@ -154,7 +154,7 @@ if __name__ == '__main__':
 	# mask -- get from the Veg file of firescar_list[0]
 	mask = rasterio.open( firescar_list[0].replace('FireScar_', 'Veg_') ).read_masks( 1 )
 	mask = (mask == 255).astype(int)
-	mask_value = 0
+	mask_value = -9999
 
 	# run relative flammability
 	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=ncores, mask_arr=mask, mask_value=mask_value, crs={'init':'epsg:3338'} )

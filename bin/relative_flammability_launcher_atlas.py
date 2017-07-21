@@ -37,6 +37,7 @@ if __name__ == '__main__':
 		slurm_path = os.path.join( output_path, 'slurm' )
 		if not os.path.exists( slurm_path ):
 			os.makedirs( slurm_path )
-
+		os.chdir( slurm_path )
+		
 		slurm_file = os.path.join( slurm_path, 'slurm_run_{}.slurm'.format(maps_path.split(os.path.sep)[-2]) )
 		run_model( slurm_file, maps_path, output_filename, ncores )
