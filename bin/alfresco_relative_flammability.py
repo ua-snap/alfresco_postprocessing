@@ -1,13 +1,10 @@
 import numpy as np
 import pandas as pd
 from pathos import multiprocessing
+from pathos.mp_map import mp_map
 import rasterio
-
-# def prep_firescar( fn ):
-# 	import rasterio
-# 	array1 = rasterio.open( fn ).read( 3 )
-# 	array1 = np.where( array1 > -2147483647, 1, 0 )
-# 	return array1
+import multiprocessing as mp
+from functools import partial
 
 def get_repnum( fn ):
 	''' 
@@ -22,44 +19,48 @@ def read_raster( fn, band, masked=False, **kwargs ):
 		arr = out.read( band, masked=masked )
 	return arr
 
-def sum_firescars( firescar_list, ncores ):
-	from functools import partial
-	from pathos.mp_map import mp_map
+def prep_firescar( arr ):
+	arr = np.where( arr >= 0, 1, 0 )
+	return arr
 
+f = partial( read_raster, band=3, masked=False )
+
+def rg( fn ):
+	from functools import partial
+	arr = f( fn )
+	return np.where( arr >= 0, 1, 0 )
+
+# def run_group( group ):
+# 	from pathos.mp_map import mp_map
+# 	# group_arr = np.array( mp_map( rg, group, nproc=32 ) )
+# 	pool = mp.Pool( 32 )
+# 	group_arr = np.array( pool.map( rg, group ) )
+# 	pool.close()
+# 	pool.join()
+# 	group_sum = np.sum( group_arr, axis=0 )
+# 	return group_sum
+
+def run_group( group ):
+	# from pathos.mp_map import mp_map
+	group_arr = np.array([ rg(fn) for fn in group ])
+	# group_arr = np.array( mp_map( rg, group, nproc=32 ) )
+	group_sum = np.sum( group_arr, axis=0 )
+	return group_sum
+
+def sum_firescars( firescar_list, ncores ):
 	# groupby the replicate number
 	firescar_series = pd.Series( firescar_list )
 	repgrouper = firescar_series.apply( get_repnum )
 	firescar_groups = [ j.tolist() for i,j in firescar_series.groupby( repgrouper ) ]
 
 	# open the rasters and stack to array with their oob values masked.
-	repsums = []
-	for group in firescar_groups:
-		group_arr = np.ma.array( mp_map( partial( read_raster, band=3, masked=True ), group, nproc=32 ), 
-									keep_mask=True, fill_value=-9999 )
-		group_sum = np.sum( group_arr, axis=0 )
-		repsums = repsums + [ group_sum ]
+	pool = mp.Pool( ncores )
+	repsums = pool.map( run_group, firescar_groups )
+	pool.close()
+	pool.join()
 
-	repsums = np.ma.array( repsums, keep_mask=True )
-	sum_arr = repsums.sum( axis=0 )
+	sum_arr = np.sum( np.array(repsums), axis=0 )
 	return sum_arr
-
-# def sum_firescars2( firescar_list, ncores ):
-# 	''' HUUUGE RAM HOG, but very fast. '''
-# 	pool = multiprocessing.Pool( processes=ncores, maxtasksperchild=2 )
-
-# 	# groupby the replicate number
-# 	firescar_series = pd.Series( firescar_list )
-# 	repgrouper = firescar_series.apply( get_repnum )
-# 	firescar_groups = [ j.tolist() for i,j in firescar_series.groupby( repgrouper ) ]
-
-# 	def run( group ):
-# 		return np.sum( [ rasterio.open( fn ).read( 3 ) for fn in group ], axis=0 )
-
-# 	repsums = pool.map( run, firescar_groups )
-# 	# repsums = [ pool.map( lambda fn: np.sum( [ rasterio.open( fn ).read( 3 ), group ), axis=0 ) for group in firescar_groups ]
-# 	pool.close()
-# 	sum_arr = np.sum( repsums, axis=0 )
-# 	return sum_arr
 
 def relative_flammability( firescar_list, output_filename, ncores=None, mask_arr=None, mask_value=None, crs=None ):
 	'''
@@ -89,7 +90,7 @@ def relative_flammability( firescar_list, output_filename, ncores=None, mask_arr
 	out = sum_firescars( firescar_list, ncores=ncores )
 
 	# calculate the relative flammability -- and fill in the mask with -9999
-	relative_flammability = ( out.astype( np.float32 ) / len( firescar_list ) ).filled()
+	relative_flammability = ( out.astype( np.float32 ) / len( firescar_list ) )
 
 	if mask_value == None:
 		mask_value = tmp_rst.nodata
@@ -131,7 +132,7 @@ if __name__ == '__main__':
 	parser.add_argument( '-p', '--maps_path', action='store', dest='maps_path', type=str, help='path to ALFRESCO output Maps directory' )
 	parser.add_argument( '-o', '--output_filename', action='store', dest='output_filename', type=str, help='path to output directory' )
 	parser.add_argument( '-nc', '--ncores', action='store', dest='ncores', type=int, help='number of cores' )
-	parser.add_argument( '-m', '--mask', nargs='?', const=1, default=None, action='store', dest='mask', type=str, help='path to mask raster if desired.' )
+	# parser.add_argument( '-m', '--mask', nargs='?', const=1, default=None, action='store', dest='mask', type=str, help='path to mask raster if desired.' )
 
 	args = parser.parse_args()
 	
@@ -141,14 +142,20 @@ if __name__ == '__main__':
 	# if args.mask:
 	# 	mask = rasterio.open( args.mask )
 
+	# # TEST
+	# maps_path = '/atlas_scratch/apbennett/IEM_AR5/GFDL-CM3_rcp60/Maps'
+	# output_filename = '/workspace/Shared/Users/malindgren/TEST_ALF/alf_relflam_test.tif'
+	# ncores = 32
+
 	# list the rasters we are going to use here
 	firescar_list = [ os.path.join( root, fn ) for root, subs, files in os.walk( maps_path ) 
 							for fn in files if 'FireScar_' in fn and fn.endswith('.tif') ]
 
+	# mask -- get from the Veg file of firescar_list[0]
+	mask = rasterio.open( firescar_list[0].replace('FireScar_', 'Veg_') ).read_masks( 1 )
+	mask = (mask == 255).astype(int)
+	mask_value = 0
+
 	# run relative flammability
-	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=ncores, mask_arr=None, mask_value=None, crs={'init':'epsg:3338'} )
+	relflam_fn = relative_flammability( firescar_list, output_filename, ncores=ncores, mask_arr=mask, mask_value=mask_value, crs={'init':'epsg:3338'} )
 
-
-# # # TESTING # # # 
-# duplicate the existing test data to a few replicates
-# duplicate = [ [ shutil.copy( fn, fn.replace('_0_', '_'+str(i)+'_') ) for fn in firescar_list ] for i in [1,2,3,4] ]
