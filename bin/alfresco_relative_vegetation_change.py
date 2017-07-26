@@ -40,11 +40,13 @@ def main( args ):
 	run relative flammability with the input args dict from argparse
 	'''
 	import numpy as np
-	if not os.path.exists( args.output_path ):
-		os.makedirs( output_path )
+
+	dirname, basename = os.path.split( ars.output_filename )
+	if not os.path.exists( dirname ):
+		os.makedirs( dirname )
 
 	# list, sort, group by replicate
-	veg_list = [ os.path.join( root, fn ) for root, subs, files in os.walk( args.input_path ) for fn in files if 'Veg_' in fn and fn.endswith( '.tif' ) ]
+	veg_list = [ os.path.join( root, fn ) for root, subs, files in os.walk( args.maps_path ) for fn in files if 'Veg_' in fn and fn.endswith( '.tif' ) ]
 	year_list = range( args.begin_year, args.end_year + 1 )
 	veg_list = [ i for i in veg_list if int( os.path.basename( i ).split('_')[ len( os.path.basename( i ).split( '_' ) )-1 ].split( '.' )[0] ) in year_list ]
 	veg_sorted = sorted( veg_list, key=lambda x: get_rep_num( x ) )
@@ -52,7 +54,7 @@ def main( args ):
 	
 	# calculate relative vegetation change -- parallel
 	# final = mp_map( relative_veg_change, veg_grouped, nproc=int( args.ncpus ) )
-	final = [ relative_veg_change( v, int(args.ncpus) ) for v in veg_grouped ]
+	final = [ relative_veg_change( v, int(args.ncores) ) for v in veg_grouped ]
 	final = np.sum( final, axis=0 ) / np.float( len(veg_list) )
 
 	# set dtype to float32 and round it
@@ -67,8 +69,8 @@ def main( args ):
 	# write it out
 	meta = rasterio.open( veg_list[ 0 ] ).meta
 	meta.update( compress='lzw', dtype=np.float32, crs={ 'init':'EPSG:3338' }, nodata=-9999 )
-	output_filename = os.path.join( args.output_path, 'alfresco_relative_vegetation_change_counts_' + args.model + '_' + args.scenario + '_' + str(args.begin_year) + '_' + str(args.end_year) + '.tif' )
-	with rasterio.open( output_filename, 'w', **meta ) as out:
+	# output_filename = os.path.join( args.output_path, 'alfresco_relative_vegetation_change_counts_' + args.model + '_' + args.scenario + '_' + str(args.begin_year) + '_' + str(args.end_year) + '.tif' )
+	with rasterio.open( args.output_filename, 'w', **meta ) as out:
 		out.write( final, 1 )
 	return output_filename
 
@@ -105,15 +107,23 @@ if __name__ == '__main__':
 	# args = hold( input_path, output_path, scenario, model, script_path, ncpus, begin_year, end_year )
 	# # # END TESTING
 	
-	parser = argparse.ArgumentParser( description='program to calculate Relative Vegetation Change from ALFRESCO Veg outputs' )
-	parser.add_argument( '-p', '--input_path', action='store', dest='input_path', type=str, help='path to ALFRESCO output Maps directory' )
-	parser.add_argument( '-o', '--output_path', action='store', dest='output_path', type=str, help='path to output directory' )
-	parser.add_argument( '-m', '--model', action='store', dest='model', type=str, help='model name' )
-	parser.add_argument( '-s', '--scenario', action='store', dest='scenario', type=str, help='scenario' )
-	parser.add_argument( '-n', '--ncpus', action='store', dest='ncpus', type=int, help='number of cores to utilize' )
+	# parser = argparse.ArgumentParser( description='program to calculate Relative Vegetation Change from ALFRESCO Veg outputs' )
+	# parser.add_argument( '-p', '--input_path', action='store', dest='input_path', type=str, help='path to ALFRESCO output Maps directory' )
+	# parser.add_argument( '-o', '--output_path', action='store', dest='output_path', type=str, help='path to output directory' )
+	# parser.add_argument( '-m', '--model', action='store', dest='model', type=str, help='model name' )
+	# parser.add_argument( '-s', '--scenario', action='store', dest='scenario', type=str, help='scenario' )
+	# parser.add_argument( '-n', '--ncpus', action='store', dest='ncpus', type=int, help='number of cores to utilize' )
+	# parser.add_argument( '-by', '--begin_year', action='store', dest='begin_year', type=int, help='beginning year in the range' )
+	# parser.add_argument( '-ey', '--end_year', action='store', dest='end_year', type=int, help='ending year in the range' )
+	
+	parser = argparse.ArgumentParser( description='program to calculate Relative Flammability from ALFRESCO' )
+	parser.add_argument( '-p', '--maps_path', action='store', dest='maps_path', type=str, help='path to ALFRESCO output Maps directory' )
+	parser.add_argument( '-o', '--output_filename', action='store', dest='output_filename', type=str, help='path to output directory' )
+	parser.add_argument( '-nc', '--ncores', action='store', dest='ncores', type=int, help='number of cores' )
 	parser.add_argument( '-by', '--begin_year', action='store', dest='begin_year', type=int, help='beginning year in the range' )
 	parser.add_argument( '-ey', '--end_year', action='store', dest='end_year', type=int, help='ending year in the range' )
-	
+
+
 	args = parser.parse_args()
 	print( ' running %s : scenario %s' % ( args.model, args.scenario ) )
 	_ = main( args )
