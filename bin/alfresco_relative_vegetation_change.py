@@ -125,7 +125,6 @@ if __name__ == '__main__':
 
 
 	args = parser.parse_args()
-	print( ' running %s : scenario %s' % ( args.model, args.scenario ) )
 	_ = main( args )
 
 

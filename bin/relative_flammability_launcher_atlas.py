@@ -30,7 +30,7 @@ if __name__ == '__main__':
 	#  10 is good for 200 years / 200 reps over IEM AOI
 	ncores = 10 
 
-	# IEM DATA TIMESTEPS.
+	# IEM DATA TIMESTEPS...
 	year_ranges = [(1900,1999), (2000,2099), (1900,2099)]
 	maps_paths = [ os.path.join( base_path, i, 'Maps' ) for i in sub_dirs ]
 	output_filenames = [ os.path.join( output_path, 'alfresco_relative_flammability_'+os.path.basename(sub)+'.tif' ) for sub in sub_dirs ]
