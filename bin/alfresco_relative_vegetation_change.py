@@ -41,7 +41,7 @@ def main( args ):
 	'''
 	import numpy as np
 
-	dirname, basename = os.path.split( ars.output_filename )
+	dirname, basename = os.path.split( args.output_filename )
 	if not os.path.exists( dirname ):
 		os.makedirs( dirname )
 
