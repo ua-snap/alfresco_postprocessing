@@ -141,8 +141,8 @@ if __name__ == '__main__':
 	maps_path = args.maps_path
 	output_filename = args.output_filename
 	ncores = args.ncores
-	begin_year = begin_year
-	end_year = end_year
+	begin_year = args.begin_year
+	end_year = args.end_year
 	# if args.mask:
 	# 	mask = rasterio.open( args.mask )
 

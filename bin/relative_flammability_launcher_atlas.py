@@ -13,7 +13,7 @@ def run_model( fn, maps_path, output_filename, ncores, begin_year, end_year ):
 	script_path = '/workspace/UA/malindgren/repos/alfresco_postprocessing/bin/alfresco_relative_flammability.py'
 	with open( fn, 'w' ) as f:
 		command = ' '.join([ 'ipython', script_path,\
-							 '--', '-p', maps_path, '-o', output_filename, '-nc', str(ncores), '-by', begin_year, '-ey', end_year ])
+							 '--', '-p', maps_path, '-o', output_filename, '-nc', str(ncores), '-by', str(begin_year), '-ey', str(end_year) ])
 		f.writelines( head + '\n' + command + '\n' )
 	subprocess.call([ 'sbatch', fn ])
 	return 1
