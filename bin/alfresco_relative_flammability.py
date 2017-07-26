@@ -132,6 +132,8 @@ if __name__ == '__main__':
 	parser.add_argument( '-p', '--maps_path', action='store', dest='maps_path', type=str, help='path to ALFRESCO output Maps directory' )
 	parser.add_argument( '-o', '--output_filename', action='store', dest='output_filename', type=str, help='path to output directory' )
 	parser.add_argument( '-nc', '--ncores', action='store', dest='ncores', type=int, help='number of cores' )
+	parser.add_argument( '-by', '--begin_year', action='store', dest='begin_year', type=int, help='beginning year in the range' )
+	parser.add_argument( '-ey', '--end_year', action='store', dest='end_year', type=int, help='ending year in the range' )
 	# parser.add_argument( '-m', '--mask', nargs='?', const=1, default=None, action='store', dest='mask', type=str, help='path to mask raster if desired.' )
 
 	args = parser.parse_args()
@@ -139,17 +141,24 @@ if __name__ == '__main__':
 	maps_path = args.maps_path
 	output_filename = args.output_filename
 	ncores = args.ncores
+	begin_year = begin_year
+	end_year = end_year
 	# if args.mask:
 	# 	mask = rasterio.open( args.mask )
 
 	# # TEST
 	# maps_path = '/atlas_scratch/apbennett/IEM_AR5/GFDL-CM3_rcp60/Maps'
-	# output_filename = '/workspace/Shared/Users/malindgren/TEST_ALF/alf_relflam_test.tif'
+	# output_filename = '/workspace/Shared/Users/malindgren/TEST_ALF/alf_relflam_test_1900_1999.tif'
 	# ncores = 32
+	# begin_year = 1900
+	# end_year = 1999
 
 	# list the rasters we are going to use here
 	firescar_list = [ os.path.join( root, fn ) for root, subs, files in os.walk( maps_path ) 
 							for fn in files if 'FireScar_' in fn and fn.endswith('.tif') ]
+
+	year_list = range( begin_year, end_year + 1 )
+	firescar_list = [ i for i in firescar_list if int( os.path.basename( i ).split('_')[ len( os.path.basename( i ).split( '_' ) )-1 ].split( '.' )[0] ) in year_list ]
 
 	# mask -- get from the Veg file of firescar_list[0]
 	mask = rasterio.open( firescar_list[0].replace('FireScar_', 'Veg_') ).read_masks( 1 )
