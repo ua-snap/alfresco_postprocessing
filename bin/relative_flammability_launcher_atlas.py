@@ -18,7 +18,6 @@ def run_model( fn, maps_path, output_filename, ncores, begin_year, end_year ):
 	subprocess.call([ 'sbatch', fn ])
 	return 1
 
-
 if __name__ == '__main__':
 	import os, glob, subprocess
 
@@ -35,11 +34,11 @@ if __name__ == '__main__':
 	maps_paths = [ os.path.join( base_path, i, 'Maps' ) for i in sub_dirs ]
 	output_filenames = [ os.path.join( output_path, 'alfresco_relative_flammability_'+os.path.basename(sub)+'.tif' ) for sub in sub_dirs ]
 
-	for maps_path, output_filename in zip( maps_paths, output_filenames ):
+	for maps_path, out_fn in zip( maps_paths, output_filenames ):
 		for year_range in year_ranges:
 			begin_year, end_year = year_range
-			output_filename = output_filename.replace('.tif', '_{}_{}.tif'.format(begin_year, end_year))
-
+			output_filename = out_fn.replace('.tif', '_{}_{}.tif'.format(str(begin_year), str(end_year)))
+		
 			slurm_path = os.path.join( output_path, 'slurm' )
 			if not os.path.exists( slurm_path ):
 				os.makedirs( slurm_path )
