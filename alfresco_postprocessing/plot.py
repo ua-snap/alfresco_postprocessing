@@ -274,7 +274,7 @@ def vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(195
 			_ = vegcounts_lineplot( mod, output_path, domain, modplot.model, modplot.scenario, vegtype, replicate=None, year_range=(1950,2100) )
 	return 'success!'
 
-def aab_lineplot( modeled, observed, output_path, domain, model, scenario, replicates=[None], year_range=(1950,2100), *args, **kwargs ):
+def aab_lineplot( modeled, observed, output_path, domain, model, scenario, replicates=[None], year_range=(1950,2100) ):
 	'''
 	CONSIDERED UNDER DEVELOPMENT AND NON-WORKING!
 	function to build the needed output plot for the cumulative area burned calibration plot
@@ -338,8 +338,8 @@ def aab_lineplot( modeled, observed, output_path, domain, model, scenario, repli
 		plt.savefig( output_filename )
 		plt.close()
 	return 'success!'
-
-def aab_lineplot_factory( modplot, obsplot, output_path, replicates=[None], year_range=(1950, 2100), *args, **kwargs ):
+	
+def aab_lineplot_factory( modplot, obsplot, output_path, replicates, year_range ):
 	# modeled, observed, output_path, domain, model, scenario, replicates=[None], year_range=(1950,2100)
 	'''
 	function to build the needed output barplots
