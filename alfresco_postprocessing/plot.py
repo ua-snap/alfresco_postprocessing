@@ -339,7 +339,7 @@ def aab_lineplot( modeled, observed, output_path, domain, model, scenario, repli
 		plt.close()
 	return 'success!'
 	
-def aab_lineplot_factory( modplot, obsplot, output_path, replicates, year_range ):
+def aab_lineplot_factory( modplot, obsplot, output_path, replicates=None, year_range=(1950,2100), **kwargs ):
 	# modeled, observed, output_path, domain, model, scenario, replicates=[None], year_range=(1950,2100)
 	'''
 	function to build the needed output barplots
