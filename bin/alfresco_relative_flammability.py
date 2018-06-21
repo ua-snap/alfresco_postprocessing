@@ -102,10 +102,6 @@ def relative_flammability( firescar_list, output_filename, ncores=None, mask_arr
 		relative_flammability[ mask_arr == 0 ] = mask_value
 
 	meta = tmp_rst.meta
-	# pop out transform to overcome warning
-	if 'transform' in meta.keys():
-		_ = meta.pop( 'transform' )
-
 	meta.update( compress='lzw', count=1, dtype='float32', nodata=mask_value )
 
 	if crs:
