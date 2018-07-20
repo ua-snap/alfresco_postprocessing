@@ -209,9 +209,9 @@ def run_postprocessing_historical( maps_path, out_json_fn, ncores, veg_name_dict
 # THIS FUNCTION NEEDS CHANGING SINCE WE NO LONGER USE THE NAME PostProcess, nor do we access the raster file in that same way.
 # IT IS BETTER SUITED TO BEING PULLED FROM THE FIRST OF THE TimeStep objects.
 def run_postprocessing( maps_path, out_json_fn, ncores, veg_name_dict, subdomains_fn=None, \
-	id_field=None, name_field=None, background_value=0 ): # background value is problematic
+	id_field=None, name_field=None, background_value=0, lagfire=False ): # background value is problematic
 	db = ap._open_tinydb( out_json_fn )
-	fl = FileLister( maps_path, lagfire=True )
+	fl = FileLister( maps_path, lagfire=lagfire )
 	# open a template raster
 	rst = rasterio.open( fl.files[0] )
 	sub_domains = read_subdomains( subdomains_fn=subdomains_fn, rasterio_raster=rst, \
