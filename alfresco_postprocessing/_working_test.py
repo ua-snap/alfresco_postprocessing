@@ -93,7 +93,7 @@ class SubDomains( object ):
 		id_groups = gdf.groupby( self.id_field ) # iterator of tuples (id, gdf slice)
 
 		out_shape = self.rasterio_raster.height, self.rasterio_raster.width
-		out_transform = self.rasterio_raster.affine
+		out_transform = self.rasterio_raster.transform
 
 		arr_list = [ self._rasterize_id( df, value, out_shape, out_transform, fill=fill ) for value, df in id_groups ]
 		self.subdomains = arr_list
