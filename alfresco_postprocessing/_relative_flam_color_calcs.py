@@ -10,7 +10,7 @@ def return_median_thresh( nyears=200, nreps=200, min_fri=100 ):
 	time, which can be viewed as less flammable.
 	'''
 	ntotal = nyears * nreps
-	burn_potential = nyears ) / min_fri
+	burn_potential = (nyears ) / min_fri
 	burn_total = burn_potential * nreps
 	max_index = burn_total / ntotal
 	return max_index / 2
