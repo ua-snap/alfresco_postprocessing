@@ -144,7 +144,7 @@ class VegFire( object ):
 					for domain_num, domain in domains } # changed (raster_arr > 0) from (raster_arr >= 0)  WATCH IT!
 
 
-class BurnSeverity( object ):
+class BurnSeverityHistory( object ):
 	'''
 	[ experimental ]
 	calculate BurnSeverity metrics from ALFRESCO Fire Dynamics Model 
