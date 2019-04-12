@@ -63,8 +63,8 @@ class FileLister( object ):
 		return df_wide
 	def _lag_fire( self ):
 		df = self.df
-		firevars = [ 'FireScar','BurnSeverity' ]
-		othervars = [ 'Age','Veg','BasalArea' ]
+		firevars = [ 'FireScar','BurnSeverityHistory' ] # 'BurnSeverity'
+		othervars = [ 'Age','Veg' ]
 		replicates, years = df.index.levels
 		fire = pd.concat( [ df[ v ].drop( years.min(), level=1 ) for v in firevars ], axis=1 )
 		other = pd.concat( [ df[ v ].drop( years.max(), level=1 ) for v in othervars ], axis=1 )
