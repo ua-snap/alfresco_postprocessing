@@ -41,7 +41,7 @@ class Fire( object ):
 		return { i:np.sum( self.fire_counts[ i ].values() ) for i in self.fire_counts.keys() }
 	def _unique_counts_domains( self ):
 		domains = self.alf_ds.sub_domains.sub_domains
-		domains = [ (np.unique( domain[domain > 0] )[0], domain) for domain in domains ]
+		domains = [ (np.unique( domain[domain > 0] )[0], domain) for domain in domains if len(domain[domain > 0]) > 0 ] #[ modified for JFSP ]
 		raster_arr = self.alf_ds.raster_arr
 		return { self.alf_ds.sub_domains.names_dict[domain_num]:\
 					dict( zip( *np.unique( raster_arr[ (domain == domain_num) & (raster_arr > 0) ], return_counts=True ) ) ) \
