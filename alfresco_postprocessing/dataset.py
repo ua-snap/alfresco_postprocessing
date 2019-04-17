@@ -183,7 +183,7 @@ class SubDomains( object ):
 		arr_list = [ i for i in arr_list if not np.all(i == self.background_value) ] # [added for JFSP app update...]
 		self.sub_domains = arr_list
 		# update the names dict if arr members were dropped due to non-overlap
-		all_values = [ np.unique(i[i!=background_value])[0] for i in arr_list ] # [added for JFSP app update...]
+		all_values = [ np.unique(i[i != self.background_value])[0] for i in arr_list ] # [added for JFSP app update...]
 		self.names_dict = { i:self.names_dict[i] for i in all_values } # [added for JFSP app update...]
 	@staticmethod
 	def _rasterize_id( df, value, out_shape, out_transform, background_value=0 ):
