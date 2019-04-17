@@ -180,6 +180,7 @@ class SubDomains( object ):
 		out_transform = self.rasterio_raster.transform
 
 		arr_list = [ self._rasterize_id( df, value, out_shape, out_transform, background_value=self.background_value ) for value, df in id_groups ]
+		arr_list = [ i for i in arr_list if not np.all(i == 0) ] # [added for JFSP app update...]
 		self.sub_domains = arr_list
 	@staticmethod
 	def _rasterize_id( df, value, out_shape, out_transform, background_value=0 ):
