@@ -149,8 +149,8 @@ class SubDomains( object ):
 		self.id_field = id_field
 		self.name_field = name_field
 		self.background_value = background_value
-		self._rasterize_subdomains( )
 		self._get_subdomains_dict( )
+		self._rasterize_subdomains( )
 
 	def _rasterize_subdomains( self ):
 		'''
