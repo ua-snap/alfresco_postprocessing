@@ -195,7 +195,7 @@ def aab_barplot_factory( modplot, obsplot, output_path, replicate, year_range=(1
 		_ = ap.aab_barplot( mod, obs, output_path, domain, replicate, modplot.model, modplot.scenario, year_range, *args, **kwargs )
 	return 'success!'
 
-def vegcounts_lineplot( modeled, output_path, domain, model, scenario, vegtype, replicate=None, year_range=(1950,2100), *args, **kwargs ):
+def vegcounts_lineplot( modeled, output_path, domain, model, scenario, vegtype, replicate, year_range, *args, **kwargs ):
 	'''
 	CONSIDERED UNDER DEVELOPMENT!
 
@@ -256,7 +256,7 @@ def vegcounts_lineplot( modeled, output_path, domain, model, scenario, vegtype, 
 	plt.savefig( output_filename )
 	plt.close()
 
-def vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(1950, 2100), *args, **kwargs ):
+def vegcounts_lineplot_factory( modplot, output_path, replicate=None, year_range=(1950, 2100), *args, **kwargs ):
 	'''
 	function to build the needed output barplots
 	'''
@@ -271,7 +271,7 @@ def vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(195
 		for vegtype in vegtypes:
 			mod = mod_dict[ domain ][ vegtype ].loc[ years, : ] #str(replicate)
 			mod.name = 'modeled'
-			_ = vegcounts_lineplot( mod, output_path, domain, modplot.model, modplot.scenario, vegtype, replicate=None, year_range=(1950,2100) )
+			_ = vegcounts_lineplot( mod, output_path, domain, modplot.model, modplot.scenario, vegtype, replicate, year_range )
 	return 'success!'
 
 def aab_lineplot( modeled, observed, output_path, domain, model, scenario, replicates, year_range ):
@@ -339,7 +339,7 @@ def aab_lineplot( modeled, observed, output_path, domain, model, scenario, repli
 		plt.close()
 	return 'success!'
 	
-def aab_lineplot_factory( modplot, obsplot, output_path, replicates=None, year_range=(1950,2100), **kwargs ):
+def aab_lineplot_factory( modplot, obsplot, output_path, replicates=None, year_range=(1950,2100) ):
 	# modeled, observed, output_path, domain, model, scenario, replicates=[None], year_range=(1950,2100)
 	'''
 	function to build the needed output barplots
@@ -348,6 +348,7 @@ def aab_lineplot_factory( modplot, obsplot, output_path, replicates=None, year_r
 	metric = 'total_area_burned'
 	mod_dict = modplot.get_metric_dataframes( metric )
 	obs_dict = obsplot.get_metric_dataframes( metric )
+	print(year_range)
 	begin, end = year_range
 	years = [ str(i) for i in range( begin, end+1 ) ]
 
