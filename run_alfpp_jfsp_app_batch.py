@@ -4,6 +4,7 @@
 
 import alfresco_postprocessing as ap
 import os
+import numpy as np
 
 # # input args
 ncores = 32
@@ -36,7 +37,7 @@ for group in treatment_groups:
 		# # PostProcess
 		# alfresco output gtiffs
 		pp = ap.run_postprocessing( maps_path, mod_json_fn, ncores, ap.veg_name_dict, subdomains_fn, id_field, name_field )
-		
+
 		# historical fire input gtiffs
 		pp_hist = ap.run_postprocessing_historical( historical_maps_path, obs_json_fn, ncores, ap.veg_name_dict, \
 													subdomains_fn, id_field, name_field)
@@ -56,15 +57,23 @@ for group in treatment_groups:
 		# build plot objects for comparison plots
 		modplot = ap.Plot( mod_json_fn, model=run_name, scenario=scenario )
 		obsplot = ap.Plot( obs_json_fn, model='historical', scenario='observed' )
+		
+		# [NEW]
+		obs_fire_years = obsplot.fire_years
+		mod_fire_years = modplot.fire_years
+		fire_years = np.concatenate([obs_fire_years,mod_fire_years]).astype(int)
+		begin_range, end_range = fire_years.min(), fire_years.max()
+		# [end NEW]
 
 		# annual area burned barplot
 		replicate = 0
 		if scenario == 'historical':
+			# ap.aab_barplot_factory( modplot, obsplot, output_path, replicate, year_range=(1950, 2010) )
 			ap.aab_barplot_factory( modplot, obsplot, output_path, replicate, year_range=(1950, 2010) )
 
 		# veg counts lineplots
-		ap.vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(1950, 2100))
+		ap.vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(1950, end_range))
 
 		# annual area burned lineplots
-		ap.aab_lineplot_factory( modplot, obsplot, output_path, replicates=None, year_range=(1950,2100) )
+		ap.aab_lineplot_factory( modplot, obsplot, output_path, replicates=None, year_range=(1950, end_range) )
 
