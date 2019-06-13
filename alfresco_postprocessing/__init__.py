@@ -16,15 +16,16 @@ from functools import partial
 
 
 # # VEGETATION MAP DEFAULT:
-veg_name_dict = {1:'Black Spruce',
-				2:'White Spruce',
-				3:'Deciduous',
-				4:'Shrub Tundra',
-				5:'Graminoid Tundra',
-				6:'Wetland Tundra',
-				7:'Barren lichen-moss',
-				8:'Temperate Rainforest'}
-
+veg_name_dict = {0: 'NoVeg',
+				1: 'Tundra',
+				2: 'BSpruce',
+				3: 'WSpruce',
+				4: 'Decid',
+				5: 'ShrubTundra',
+				6: 'GraminoidTundra',
+				7: 'WetlandTundra',
+				8: 'BarrenLichenMoss',
+				9: 'TemperateRainforest'}
 
 # # UTILITY FUNCTIONS -- Run PostProcess
 def	open( alf_fn, sub_domains=None, observed=False ):
