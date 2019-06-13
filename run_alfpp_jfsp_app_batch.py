@@ -7,16 +7,20 @@ import os
 import numpy as np
 
 # # input args
-ncores = 32
+ncores = 64
 historical_maps_path = '/Data/Base_Data/ALFRESCO/AK_CAN_ALF_fires_geotiffs/files'
-subdomains_fn = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/shapefiles/combined_boreal_firemgmtzones_alfpp.shp'
-id_field = 'OBJECTID'
-name_field = 'Name'
+# subdomains_fn = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/shapefiles/combined_boreal_firemgmtzones_alfpp.shp'
+subdomains_fn = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/shapefiles/akecoregions_level2_dissolve_MLedit.shp'
+# id_field = 'OBJECTID'
+id_field = 'OBJECT_ID'
+# name_field = 'Name'
+name_field = 'LEVEL_2'
 metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned','severity_counts' ]
-
 base_path = '/big_scratch/shiny/Runs_Statewide/paul.duffy@neptuneinc.org'
-out_path = '/atlas_scratch/malindgren/ALFRESCO_PostProcessing/JFSP' # this is the base out dir
+# out_path = '/atlas_scratch/malindgren/ALFRESCO_PostProcessing/JFSP/FireManagementZones' # this is the base out dir
+out_path = '/atlas_scratch/malindgren/ALFRESCO_PostProcessing/JFSP/EcoregionsLevel2' # this is the base out dir
 treatment_groups = ['cru_none','cru_tx0','gcm_tx0','gcm_tx1','gcm_tx2']
+
 for group in treatment_groups:
 	print('running treatment group: {}'.format(group))
 	alf_runs = os.listdir(os.path.join(base_path, group))
@@ -48,8 +52,8 @@ for group in treatment_groups:
 		pp.close() # close the database
 
 		# historical
-		metrics = [ 'avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned' ]
-		out = ap.to_csvs( pp_hist, metrics, output_path, suffix, observed=True )
+		historical_metrics = [ 'avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned' ]
+		out = ap.to_csvs( pp_hist, historical_metrics, output_path, suffix, observed=True )
 		pp_hist.close()
 
 		# * * * * * * * * PLOTTING * * * * * * * * * * * * * * * * * * * * * * * * * *
