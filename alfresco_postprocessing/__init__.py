@@ -190,13 +190,13 @@ def _get_stats( timesteps, db, sub_domains, ncores, veg_name_dict ):
 	del out
 	return db
 
-def run_postprocessing_historical( maps_path, out_json_fn, ncores, veg_name_dict, subdomains_fn=None, id_field=None, name_field=None, background_value=0 ):
+def run_postprocessing_historical( maps_path, out_json_fn, ncores, veg_name_dict, subdomains_fn=None, id_field=None, name_field=None, background_value=0, id_name_dict=None ):
 	import glob, os
 	import multiprocessing
 	file_list = glob.glob( os.path.join( maps_path, '*.tif' ) )
 	db = _open_tinydb( out_json_fn )
 	rst = rasterio.open( file_list[0] )
-	sub_domains = read_subdomains( subdomains_fn=subdomains_fn, rasterio_raster=rst, id_field=id_field, name_field=name_field, background_value=0 )
+	sub_domains = read_subdomains( subdomains_fn=subdomains_fn, rasterio_raster=rst, id_field=id_field, name_field=name_field, background_value=0, id_name_dict=None )
 
 	pool = multiprocessing.Pool( processes=ncores, maxtasksperchild=4 )
 	# run parallel map using multiprocessing 
@@ -210,13 +210,13 @@ def run_postprocessing_historical( maps_path, out_json_fn, ncores, veg_name_dict
 # THIS FUNCTION NEEDS CHANGING SINCE WE NO LONGER USE THE NAME PostProcess, nor do we access the raster file in that same way.
 # IT IS BETTER SUITED TO BEING PULLED FROM THE FIRST OF THE TimeStep objects.
 def run_postprocessing( maps_path, out_json_fn, ncores, veg_name_dict, subdomains_fn=None, \
-	id_field=None, name_field=None, background_value=0, lagfire=False ): # background value is problematic
+	id_field=None, name_field=None, background_value=0, lagfire=False, id_name_dict=None ): # background value is problematic
 	db = ap._open_tinydb( out_json_fn )
 	fl = FileLister( maps_path, lagfire=lagfire )
 	# open a template raster
 	rst = rasterio.open( fl.files[0] )
 	sub_domains = read_subdomains( subdomains_fn=subdomains_fn, rasterio_raster=rst, \
-					id_field=id_field, name_field=name_field, background_value=0 )
+					id_field=id_field, name_field=name_field, background_value=0, id_name_dict=id_name_dict )
 	ts_list = fl.timesteps
 	# fn_list = [ dict(i) for i in fn_list ]
 	return _get_stats( ts_list, db, sub_domains, ncores, veg_name_dict ) # WATCH THIS!!!!!
