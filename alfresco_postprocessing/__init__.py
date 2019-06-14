@@ -190,17 +190,17 @@ def _get_stats( timesteps, db, sub_domains, ncores, veg_name_dict ):
 	del out
 	return db
 
-def run_postprocessing_historical( maps_path, out_json_fn, ncores, veg_name_dict, subdomains_fn=None, id_field=None, name_field=None, background_value=0, id_name_dict=None ):
+def run_postprocessing_historical( maps_path, out_json_fn, ncores, subdomains_fn=None, id_field=None, name_field=None, background_value=0, id_name_dict=None ):
 	import glob, os
 	import multiprocessing
 	file_list = glob.glob( os.path.join( maps_path, '*.tif' ) )
 	db = _open_tinydb( out_json_fn )
 	rst = rasterio.open( file_list[0] )
-	sub_domains = read_subdomains( subdomains_fn=subdomains_fn, rasterio_raster=rst, id_field=id_field, name_field=name_field, background_value=0, id_name_dict=None )
+	sub_domains = read_subdomains( subdomains_fn=subdomains_fn, rasterio_raster=rst, id_field=id_field, name_field=name_field, background_value=0, id_name_dict=id_name_dict )
 
 	pool = multiprocessing.Pool( processes=ncores, maxtasksperchild=4 )
 	# run parallel map using multiprocessing 
-	f = partial( _run_historical, sub_domains=sub_domains, veg_name_dict=veg_name_dict )
+	f = partial( _run_historical, sub_domains=sub_domains, id_name_dict=id_name_dict )
 	out = pool.map( f, file_list )
 	pool.close()
 	db.insert_multiple( out )
