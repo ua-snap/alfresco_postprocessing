@@ -9,19 +9,18 @@ import numpy as np
 # # input args
 ncores = 64
 historical_maps_path = '/Data/Base_Data/ALFRESCO/AK_CAN_ALF_fires_geotiffs/files'
-subdomains_path = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/shapefiles/Corrected_AlaskaFireManagementOptions'
-id_field = 'PROT'
-name_field = 'NAME'
+subdomains_fn = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/shapefiles/akecoregions_level2_dissolve_MLedit.shp'
+id_field = 'OBJECT_ID'
+name_field = 'LEVEL_2'
 metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned','severity_counts' ]
 base_path = '/big_scratch/shiny/Runs_Statewide/paul.duffy@neptuneinc.org'
 base_path2 = '/atlas_scratch/apbennett/JFSP'
-out_path = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/ALFRESCO_PostProcessing/FireManagementOptions_fixed' # this is the base out dir
+out_path = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/ALFRESCO_PostProcessing/EcoregionsLevel2' # this is the base out dir
 treatment_groups = ['cru_tx0','gcm_tx0','gcm_tx1','gcm_tx2']
-shape_lu = {'tx0':os.path.join(subdomains_path,'SensitivityTX0.shp'),'tx1':os.path.join(subdomains_path,'SensitivityTX1.shp'),'tx2':os.path.join(subdomains_path,'SensitivityTX2.shp')}
 
+log = []
 for group in treatment_groups:
 	treatment = group.split('_')[-1]
-	subdomains_fn = shape_lu[treatment]
 	print('running treatment group: {}'.format(group))
 
 	if treatment == 'tx2':
@@ -38,12 +37,13 @@ for group in treatment_groups:
 		else:
 			maps_path = os.path.join(base_path, group, run_name, 'Maps')
 
-		# print out the treatment and maps_paths to be sure it is right:
-		print('treatment:{}\nmaps_path:{}\nshapefile:{}\n\n '.format(treatment, maps_path, subdomains_fn))
-		
 		output_path = os.path.join(out_path, group, run_name)
 		suffix = run_name # some id for the output csvs
 
+		# print out the treatment and maps_paths to be sure it is right:
+		print('treatment:{}\nmaps_path:{}\nshapefile:{}\noutput_path:{}\n\n '.format(treatment, maps_path, subdomains_fn,output_path))
+		log.append('treatment:{}\nmaps_path:{}\nshapefile:{}\noutput_path:{}\n\n '.format(treatment, maps_path, subdomains_fn,output_path))
+		
 		if not os.path.exists( output_path ):
 			_ = os.makedirs( output_path )
 
@@ -96,4 +96,8 @@ for group in treatment_groups:
 
 		# annual area burned lineplots
 		ap.aab_lineplot_factory( modplot, obsplot, output_path, replicates=None, year_range=(1950, end_range) )
+
+# write log to a logfile for transparency:
+with open(os.path.join(out_path, 'logfile_postprocessing.txt'), 'w') as f:
+	f.writelines(log)
 

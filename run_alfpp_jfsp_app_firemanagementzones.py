@@ -9,27 +9,40 @@ import numpy as np
 # # input args
 ncores = 64
 historical_maps_path = '/Data/Base_Data/ALFRESCO/AK_CAN_ALF_fires_geotiffs/files'
-# subdomains_fn = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/shapefiles/combined_boreal_firemgmtzones_alfpp.shp'
-subdomains_fn = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/shapefiles/akecoregions_level2_dissolve_MLedit.shp'
-# id_field = 'OBJECTID'
-id_field = 'OBJECT_ID'
-# name_field = 'Name'
-name_field = 'LEVEL_2'
+subdomains_fn = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/shapefiles/combined_boreal_firemgmtzones_alfpp.shp'
+id_field = 'OBJECTID'
+name_field = 'Name'
 metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned','severity_counts' ]
 base_path = '/big_scratch/shiny/Runs_Statewide/paul.duffy@neptuneinc.org'
-# out_path = '/atlas_scratch/malindgren/ALFRESCO_PostProcessing/JFSP/FireManagementZones' # this is the base out dir
-out_path = '/atlas_scratch/malindgren/ALFRESCO_PostProcessing/JFSP/EcoregionsLevel2' # this is the base out dir
-treatment_groups = ['cru_none','cru_tx0','gcm_tx0','gcm_tx1','gcm_tx2']
+base_path2 = '/atlas_scratch/apbennett/JFSP'
+out_path = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/ALFRESCO_PostProcessing_fixed/FireManagementZones' # this is the base out dir
+treatment_groups = ['cru_tx0','gcm_tx0','gcm_tx1','gcm_tx2']
 
+log = []
 for group in treatment_groups:
+	treatment = group.split('_')[-1]
 	print('running treatment group: {}'.format(group))
-	alf_runs = os.listdir(os.path.join(base_path, group))
+
+	if treatment == 'tx2':
+		alf_runs = os.listdir(os.path.join(base_path2, treatment))
+	else:
+		alf_runs = os.listdir(os.path.join(base_path, group))
+	
 	for run_name in alf_runs:
 		print('	postprocessing alfresco group: {}'.format(run_name))
 		treatment_name,scenario,model = run_name.split('_')
-		maps_path = os.path.join(base_path, group, run_name, 'Maps')
+
+		if treatment == 'tx2':
+			maps_path = os.path.join(base_path2, treatment, run_name, 'Maps')
+		else:
+			maps_path = os.path.join(base_path, group, run_name, 'Maps')
+
 		output_path = os.path.join(out_path, group, run_name)
 		suffix = run_name # some id for the output csvs
+
+		# print out the treatment and maps_paths to be sure it is right:
+		print('treatment:{}\nmaps_path:{}\nshapefile:{}\noutput_path:{}\n\n '.format(treatment, maps_path, subdomains_fn,output_path))
+		log.append('treatment:{}\nmaps_path:{}\nshapefile:{}\noutput_path:{}\n\n '.format(treatment, maps_path, subdomains_fn,output_path))
 
 		if not os.path.exists( output_path ):
 			_ = os.makedirs( output_path )
@@ -43,9 +56,12 @@ for group in treatment_groups:
 		pp = ap.run_postprocessing( maps_path, mod_json_fn, ncores, ap.veg_name_dict, subdomains_fn, id_field, name_field )
 
 		# historical fire input gtiffs
-		pp_hist = ap.run_postprocessing_historical( historical_maps_path, obs_json_fn, ncores, ap.veg_name_dict, \
-													subdomains_fn, id_field, name_field)
+		# pp_hist = ap.run_postprocessing_historical( historical_maps_path, obs_json_fn, ncores, ap.veg_name_dict, \
+		# 											subdomains_fn, id_field, name_field)
 
+		pp_hist = ap.run_postprocessing_historical(maps_path=historical_maps_path, out_json_fn=obs_json_fn, ncores=ncores, 
+													subdomains_fn=subdomains_fn, id_field=id_field, name_field=name_field,
+													id_name_dict=ap.veg_name_dict)
 		# # CSVs
 		# modeled
 		out = ap.to_csvs( pp, metrics, output_path, suffix, observed=False )
@@ -80,4 +96,8 @@ for group in treatment_groups:
 
 		# annual area burned lineplots
 		ap.aab_lineplot_factory( modplot, obsplot, output_path, replicates=None, year_range=(1950, end_range) )
+
+# write log to a logfile for transparency:
+with open(os.path.join(out_path, 'logfile_postprocessing.txt'), 'w') as f:
+	f.writelines(log)
 
