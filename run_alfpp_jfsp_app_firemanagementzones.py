@@ -15,7 +15,7 @@ name_field = 'Name'
 metrics = [ 'veg_counts','avg_fire_size','number_of_fires','all_fire_sizes','total_area_burned','severity_counts' ]
 base_path = '/big_scratch/shiny/Runs_Statewide/paul.duffy@neptuneinc.org'
 base_path2 = '/atlas_scratch/apbennett/JFSP'
-out_path = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/ALFRESCO_PostProcessing_fixed/FireManagementZones' # this is the base out dir
+out_path = '/workspace/Shared/Tech_Projects/ALF_JFSP/project_data/ALFRESCO_PostProcessing/FireManagementZones' # this is the base out dir
 treatment_groups = ['cru_tx0','gcm_tx0','gcm_tx1','gcm_tx2']
 
 log = []
