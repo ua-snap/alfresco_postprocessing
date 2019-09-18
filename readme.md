@@ -1,5 +1,5 @@
-## ALFRESCO Post-Processing
---------------------------
+# ALFRESCO Post-Processing
+
 **version 3.1**
 
 **Python Module for calculating summary statistics across the Geospatial Raster (GeoTiff) outputs from the [ALFRESCO Fire Dynamics Model](https://www.snap.uaf.edu/projects/alfresco-habitat)**
