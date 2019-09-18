@@ -30,13 +30,13 @@ make install
 ```
 
 ### Python2 requires virtualenv for the next steps, Install it.
+```sh
 cd ~/src
-# wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-15.1.0.tar.gz --no-check-certificate
 wget https://pypi.python.org/packages/d4/0c/9840c08189e030873387a73b90ada981885010dd9aea134d6de30cd24cb8/virtualenv-15.1.0.tar.gz#md5=44e19f4134906fe2d75124427dc9b716
 tar -zxvf virtualenv-15.1.0.tar.gz
 cd virtualenv-15.1.0/
 ~/.localpython/bin/python2.7 setup.py install
-
+```
 
 ## use the installation
 ### make a virtual environment where we will install some packages

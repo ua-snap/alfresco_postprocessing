@@ -1,4 +1,4 @@
-affine==2.0.0.post1
+affine>=2.0.0
 appdirs==1.4.3
 backports.shutil-get-terminal-size==1.0.0
 click==6.7
