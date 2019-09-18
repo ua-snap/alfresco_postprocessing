@@ -4,12 +4,12 @@
 
 **Python Module for calculating summary statistics across the Geospatial Raster (GeoTiff) outputs from the [ALFRESCO Fire Dynamics Model](https://www.snap.uaf.edu/projects/alfresco-habitat)**
 
-### Installation:
+## Installation:
 
-#### Install Python on Atlas Cluster
+## Install Python on Atlas Cluster
 you will need Python 2.7.11+ (this is an old tool) to run this code as it currently stands. To install it on Atlas follow [these instructions](https://github.com/ua-snap/alfresco_postprocessing/How_To_Install_and_Use_Python2_on_Atlas.md)
 
-#### Clone the repository from github
+### Clone the repository from github
 ```sh
 git clone git@github.com:ua-snap/alfresco_postprocessing.git
 cd alfresco_postprocessing
@@ -33,14 +33,14 @@ pip install numpy
 pip install -r requirements.txt
 ```
 
-#### Install `alfresco_postprocessing`
+### Install `alfresco_postprocessing`
 ```sh
 python setup.py install
 ```
 if you experience issues with using different branches, you will need to `git checkout <branch>` first, then `pip uninstall alfresco_postprocessing` if it has already been installed, followed by a re-install using the repo's `setup.py` file like the above command. I have also had luck (in the past) installing from `pip install --upgrade git+git://github.com/ua-snap/alfresco_postprocessing@master`, but YMMV.
 
 
-### Basic Usage:
+## Basic Usage:
 
 Once successfully installed package usage looks something like this:
 
@@ -140,7 +140,7 @@ if __name__ == '__main__':
 
 ```
 
-### ALFRESCO Data Output Descriptions:
+## ALFRESCO Data Output Descriptions:
 
 * Age - raster map time series at an annual timestep and contains for each pixel, its age
 in years.
