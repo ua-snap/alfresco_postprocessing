@@ -4,44 +4,10 @@
 
 **Python Module for calculating summary statistics across the Geospatial Raster (GeoTiff) outputs from the [ALFRESCO Fire Dynamics Model](https://www.snap.uaf.edu/projects/alfresco-habitat)**
 
-
-### ALFRESCO output data descriptions:
-
-* Age - raster map time series at an annual timestep and contains for each pixel, its age
-in years.
-
-* Veg - raster map time series at an annual timestep and contains for each pixel, a 
-categorical variable representing a landcover class.  Land cover classes
-transition over time due to disturbances (fire).
-```
-Internal Vegetation Class Dictionary:
-	1.) 'Black Spruce'
-	2.) 'White Spruce'
-	3.) 'Deciduous'
-	4.) 'Shrub Tundra'
-	5.) 'Graminoid Tundra'
-	6.) 'Wetland Tundra'
-	7.) 'Barren lichen-moss'
-	8.) 'Temperate Rainforest
-```
-* FireScar - A 3-banded raster map at an annual timestep.
-```
-band descriptions:
-	1.) identifies each pixel as the year since last burn.
-	2.) identifies each fire patch with a unique integer value patch count begins at 1.
-	3.) boolean value (0,1) where a fire's ignition point is 1.
-```
-* BurnSeverity - Burn severity levels for each fire patch in an ALFRESCO Output FireScar file.
-
-* BasalArea - [not yet supported]
-
-Summary statistics can also be calculated across a set of sub-domains within the Area of Interest (AOI)
-for more localized summary statistics results.
-
 ### Installation:
 
 #### Install Python on Atlas Cluster
-you will need Python 2.7.11+ (this is an old tool) to run this code as it currently stands. To install it on Atlas follow [these instructions](https://github.com/ua-snap/alfresco_postprocessing/How_To_Install_and_Use_Python2_on_Atlas)
+you will need Python 2.7.11+ (this is an old tool) to run this code as it currently stands. To install it on Atlas follow [these instructions](https://github.com/ua-snap/alfresco_postprocessing/How_To_Install_and_Use_Python2_on_Atlas.md)
 
 #### Clone the repository from github
 ```sh
@@ -49,7 +15,7 @@ git clone git@github.com:ua-snap/alfresco_postprocessing.git
 cd alfresco_postprocessing
 ```
 
-### Now lets use Python2 to make a virtual environment
+### Use Python2 to make a virtual environment
 ```sh
 ~/.localpython/bin/virtualenv venv --python=~/.localpython/bin/python2.7
 source ~/venv/bin/activate
@@ -76,7 +42,7 @@ if you experience issues with using different branches, you will need to `git ch
 
 ### Basic Usage:
 
-once installed package use looks something like this:
+Once successfully installed package usage looks something like this:
 
 ```python
 # * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -174,4 +140,43 @@ if __name__ == '__main__':
 
 ```
 
-# TODO: add information about CLI binaries that are distributed with this package for relative veg, flammability, and more.
+### ALFRESCO Data Output Descriptions:
+
+* Age - raster map time series at an annual timestep and contains for each pixel, its age
+in years.
+
+* Veg - raster map time series at an annual timestep and contains for each pixel, a 
+categorical variable representing a landcover class.  Land cover classes
+transition over time due to disturbances (fire).
+```
+Internal Vegetation Class Dictionary:
+	1.) 'Black Spruce'
+	2.) 'White Spruce'
+	3.) 'Deciduous'
+	4.) 'Shrub Tundra'
+	5.) 'Graminoid Tundra'
+	6.) 'Wetland Tundra'
+	7.) 'Barren lichen-moss'
+	8.) 'Temperate Rainforest
+```
+* FireScar - A 3-banded raster map at an annual timestep.
+```
+band descriptions:
+	1.) identifies each pixel as the year since last burn.
+	2.) identifies each fire patch with a unique integer value patch count begins at 1.
+	3.) boolean value (0,1) where a fire's ignition point is 1.
+```
+* BurnSeverity - Burn severity levels for each fire patch in an ALFRESCO Output FireScar file.
+
+* BasalArea - [not yet supported]
+
+Summary statistics can also be calculated across a set of sub-domains within the Area of Interest (AOI)
+for more localized summary statistics results.
+
+
+
+
+_TODO: add information about CLI binaries that are distributed with this package for relative veg, flammability, and more._
+
+
+
