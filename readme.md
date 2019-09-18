@@ -5,7 +5,7 @@
 **Python Module for calculating summary statistics across the Geospatial Raster (GeoTiff) outputs from the [ALFRESCO Fire Dynamics Model](https://www.snap.uaf.edu/projects/alfresco-habitat)**
 
 
-#### ALFRESCO output data descriptions:
+### ALFRESCO output data descriptions:
 
 * Age - raster map time series at an annual timestep and contains for each pixel, its age
 in years.
@@ -38,22 +38,51 @@ band descriptions:
 Summary statistics can also be calculated across a set of sub-domains within the Area of Interest (AOI)
 for more localized summary statistics results.
 
-#### Installation:
+### Installation:
 
-external package dependencies:
+#### Install Python on Atlas Cluster
+you will need Python 2.7.11+ (this is an old tool) to run this code as it currently stands. To install it on Atlas follow [these instructions](https://github.com/ua-snap/alfresco_postprocessing/How_To_Install_and_Use_Python2_on_Atlas)
+
+#### Clone the repository from github
+```sh
+git clone git@github.com:ua-snap/alfresco_postprocessing.git
+cd alfresco_postprocessing
+```
+
+### Now lets use Python2 to make a virtual environment
+```sh
+~/.localpython/bin/virtualenv venv --python=~/.localpython/bin/python2.7
+source ~/venv/bin/activate
+```
+
+[note]: external package dependencies:
 rasterio requires: `gdal` library development bindings for your system.
 
 ```bash
 # make sure that NumPy is installed first due to some dependency weirdness
 pip install numpy
-pip install --upgrade git+git://github.com/ua-snap/alfresco_postprocessing@master
+
+# install the packages needed to run alfresco_postprocessing by installing everything in the 
+# repo's `requirements.txt` file
+pip install -r requirements.txt
 ```
 
-#### Basic Usage:
+#### Install `alfresco_postprocessing`
+```sh
+python setup.py install
+```
+if you experience issues with using different branches, you will need to `git checkout <branch>` first, then `pip uninstall alfresco_postprocessing` if it has already been installed, followed by a re-install using the repo's `setup.py` file like the above command. I have also had luck (in the past) installing from `pip install --upgrade git+git://github.com/ua-snap/alfresco_postprocessing@master`, but YMMV.
+
+
+### Basic Usage:
 
 once installed package use looks something like this:
 
 ```python
+# * * * * * * * * * * * * * * * * * * * * * * * * * * *
+# ALFRESCO POST-PROCESSING EXAMPLE 
+# * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 import alfresco_postprocessing as ap
 import os
 
@@ -102,7 +131,6 @@ ap.vegcounts_lineplot_factory( modplot, output_path, replicate, year_range=(1950
 
 # annual area burned lineplots
 ap.aab_lineplot_factory( modplot, obsplot, output_path, model, scenario, replicates=[None], year_range=(1950, 2100) )
-
 ```
 the new `Plot` object generated above named `pp` contains a [TinyDB](https://tinydb.readthedocs.org/en/latest/) database as an attribute `db`, which sorts the data in a JSON file on disk, but allows for simple querying if desired by the end user.  Currently, we are using this internally as a simple and straightforward way to store the output data as json records which minimizes somewhat painful nesting utilized in older versions.
 
