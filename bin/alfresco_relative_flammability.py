@@ -4,6 +4,7 @@ Note - this script relies on a specific file organization structure
 
 import argparse
 import os
+import time
 import multiprocessing as mp
 from functools import partial
 from multiprocessing import set_start_method
@@ -117,7 +118,10 @@ if __name__ == "__main__":
     # ncores = 32
     # begin_year = 1900
     # end_year = 1999
-
+    
+    # track time
+    tic = time.perf_counter()
+    
     parser = argparse.ArgumentParser(
         description="program to calculate Relative Flammability from ALFRESCO"
     )
@@ -206,3 +210,6 @@ if __name__ == "__main__":
         ncores,
         crs={"init": "epsg:3338"},
     )
+    
+    print(f"Relative flammability computed, results written to {output_filename}")
+    print(f"Elapsed time: {round((time.perf_counter() - tic) / 60, 1)}m")
