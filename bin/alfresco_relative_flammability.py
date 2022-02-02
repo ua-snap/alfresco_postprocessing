@@ -4,6 +4,8 @@ Note - this script relies on a specific file organization structure
 
 import argparse
 import os
+# potential fix for "OpenBLAS blas_thread_init: pthread_create failed for thread . of 64: Resource temporarily unavailable" warnings
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import time
 import multiprocessing as mp
 from functools import partial
