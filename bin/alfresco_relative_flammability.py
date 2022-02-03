@@ -23,30 +23,31 @@ def get_repnum(fn):
     return os.path.basename(fn).split("_")[-2]
 
 
-def read_raster(fn, band, masked=False):
-    """ open a raster """
+def read_ignition_arr(fn, band=3, masked=False):
+    """Read a raster band and return ignition arr"""
     with rasterio.open(fn) as out:
         arr = out.read(band, masked=masked)
-    return arr
-
-
-def prep_firescar(arr):
-    arr = np.where(arr >= 0, 1, 0)
-    return arr
-
-
-f = partial(read_raster, band=3, masked=False)
-
-
-def rg(fn):
-    arr = f(fn)
     return np.where(arr >= 0, 1, 0)
 
 
 def run_group(group):
-    group_arr = np.array([rg(fn) for fn in group])
+    group_arr = np.array([read_ignition_arr(fn) for fn in group])
     group_sum = np.sum(group_arr, axis=0)
     return group_sum
+
+
+def chunk_groups(group_list, n=50):
+    """Split a list of filepath groups into smaller groups"""
+    def chunk(l, n):
+        # looping till length l
+        for i in range(0, len(l), n): 
+            yield l[i:i + n]
+
+    new_groups = []
+    for group in group_list:
+        new_groups.extend(chunk(group, n))
+        
+    return new_groups
 
 
 def sum_firescars(firescar_list, ncores):
@@ -54,6 +55,11 @@ def sum_firescars(firescar_list, ncores):
     firescar_series = pd.Series(firescar_list)
     repgrouper = firescar_series.apply(get_repnum)
     firescar_groups = [j.tolist() for i, j in firescar_series.groupby(repgrouper)]
+    
+    # Pool.map() is locking up with larger groups for some reason,
+    # try splitting into smaller groups to improve success
+    if len(firescar_groups[0]) > 50:
+        firescar_groups = chunk_groups(firescar_groups, 50)
 
     print("running firescar groups summation")
 
