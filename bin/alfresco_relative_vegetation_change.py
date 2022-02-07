@@ -1,10 +1,12 @@
 """calculate vegetation resilience counts through time"""
 
 import argparse
+import glob
 import os
+import time
+from itertools import groupby
 import rasterio
 import numpy as np
-from itertools import groupby
 from pathos.mp_map import mp_map
 
 
@@ -36,14 +38,14 @@ def open_raster(fn, band=1):
 def relative_veg_change(veg_list, ncpus=32):
     """
     opens list of vegetation filenames into 2-d numpy
-    ndarrays and counts the number of transitons in vegetation 
-    occur by pixel through the series. 
+    ndarrays and counts the number of transitons in vegetation
+    occur by pixel through the series.
     Arguments:
         veg_list:[list] list of paths to the vegetation output files
-                    from the ALFRESCO Fire Model. * expects filenames in 
+                    from the ALFRESCO Fire Model. * expects filenames in
                     chronological order *
     Returns:
-        2-D numpy.ndarray of transition counts across the list of 
+        2-D numpy.ndarray of transition counts across the list of
         filenames passed.
     """
     arr_list = mp_map(open_raster, veg_list, nproc=ncpus)
@@ -82,9 +84,21 @@ def main(args):
     ]
 
     # calculate relative vegetation change -- parallel
-    # final = mp_map( relative_veg_change, veg_grouped, nproc=int( args.ncpus ) )
+    print("Counting transitions for each rep", flush=True)
+    tic = time.perf_counter()
+
     final = [relative_veg_change(v, int(args.ncores)) for v in veg_grouped]
-    final = np.sum(final, axis=0) / np.float(len(veg_list))
+    print("Summing transitions and computing relative veg change", flush=True)
+    # divide by number of reps * number of years **minus 1** to account for
+    # true number of possible transitions
+    nyears = len(
+        [
+            fp
+            for fp in list(glob.glob(f"{args.maps_path}/*"))
+            if int(fp.split("/")[-1]) in year_list
+        ]
+    )
+    final = np.sum(final, axis=0) / float(len(veg_grouped) * (nyears - 1))
 
     # set dtype to float32 and round it
     final = final.astype(np.float32)
@@ -101,8 +115,11 @@ def main(args):
         compress="lzw", dtype=np.float32, crs={"init": "EPSG:3338"}, nodata=-9999
     )
 
+    print(f"Writing results to {args.output_filename}", end="...", flush=True)
     with rasterio.open(args.output_filename, "w", **meta) as out:
         out.write(final, 1)
+    print(f"done, total time: {round((time.perf_counter() - tic) / 60, 1)}m")
+
     return args.output_filename
 
 
