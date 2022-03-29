@@ -78,18 +78,36 @@ def main(args):
 
     # Create 2D array of x, y, and mode of vegetation type.
     mode_results = stats.mode(cube, axis=2)
-    mode_grid = np.array(mode_results[0])
+    mode_grid = np.asarray(mode_results[0])
+    mode_grid = mode_grid.reshape(mode_grid.shape[0], -1)
+    mode_grid = mode_grid.astype(np.float32)
+    mode_grid = np.around(mode_grid, 4)
+
+    # Mask the data with the out-of-bounds (255).
+    with rasterio.open(veg_list[0]) as rst:
+        arr = rst.read(1)
+        mode_grid[arr == 255] = -9999
+
+    meta = rasterio.open(veg_list[0]).meta
+    meta.update(
+        compress="lzw", dtype=np.float32, crs={"init": "EPSG:3338"}, nodata=-9999
+    )
+
+    print(f"Writing results to {args.output_filename}", end="...", flush=True)
+    with rasterio.open(args.output_filename, "w", **meta) as out:
+        out.write(mode_grid, 1)
 
     # Create list of eight 2D arrays, one 2D array for each vegetation type.
     # Each 2D array is x, y, and percentage presence of that vegetation type.
-    veg_percentage_grids = []
-    for veg_type in range(1, 9):
-        occurrences = np.sum(np.where(cube == veg_type, 1, 0), axis=2)
-        percentages = np.true_divide(occurrences, cube.shape[2])
-        veg_percentage_grids.append(percentages)
+    # veg_percentage_grids = []
+    # for veg_type in range(1, 9):
+    #     occurrences = np.sum(np.where(cube == veg_type, 1, 0), axis=2)
+    #     percentages = np.true_divide(occurrences, cube.shape[2])
+    #     veg_percentage_grids.append(percentages)
 
-    # TODO: Write results as GeoTIFFs.
+    # TODO: Write percentage vegetation GeoTIFFs.
 
+    print(f"done, total time: {round((time.perf_counter() - tic) / 60, 1)}m")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
