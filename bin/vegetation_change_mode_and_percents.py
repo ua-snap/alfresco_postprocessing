@@ -81,7 +81,6 @@ def main(args):
     mode_grid = np.asarray(mode_results[0])
     mode_grid = mode_grid.reshape(mode_grid.shape[0], -1)
     mode_grid = mode_grid.astype(np.float32)
-    mode_grid = np.around(mode_grid, 4)
 
     # Mask the data with the out-of-bounds (255).
     with rasterio.open(veg_list[0]) as rst:
