@@ -75,6 +75,8 @@ def main(args):
     # dimensions. The -1 arguments means "combine all remaining axes into one".
     # Return value shape: 2100, 3650, 2000
     cube = hypercube.reshape(hypercube.shape[0], hypercube.shape[1], -1)
+    del hypercube
+    del raster_data
 
     # Create 2D array of x, y, and mode of vegetation type.
     mode_results = stats.mode(cube, axis=2)
@@ -92,19 +94,43 @@ def main(args):
         compress="lzw", dtype=np.float32, crs={"init": "EPSG:3338"}, nodata=-9999
     )
 
-    print(f"Writing results to {args.output_filename}", end="...", flush=True)
-    with rasterio.open(args.output_filename, "w", **meta) as out:
+    dirname = os.path.dirname(args.output_filename)
+    mode_dir = dirname + "/mode"
+    percent_dir = dirname + "/percent"
+
+    for dir in [mode_dir, percent_dir]:
+        if not os.path.exists(dir):
+            os.mkdir(dir)
+
+    basename = os.path.basename(args.output_filename)
+    filename = mode_dir + "/" + basename
+
+    print(f"Writing results to {filename}", end="...", flush=True)
+    with rasterio.open(filename, "w", **meta) as out:
         out.write(mode_grid, 1)
 
     # Create list of eight 2D arrays, one 2D array for each vegetation type.
     # Each 2D array is x, y, and percentage presence of that vegetation type.
-    # veg_percentage_grids = []
-    # for veg_type in range(1, 9):
-    #     occurrences = np.sum(np.where(cube == veg_type, 1, 0), axis=2)
-    #     percentages = np.true_divide(occurrences, cube.shape[2])
-    #     veg_percentage_grids.append(percentages)
+    percentages = np.zeros((cube.shape[0], cube.shape[1]), dtype=np.float32)
+    for veg_type in range(0, 9):
+        for y in range(cube.shape[0]):
+            sums = np.sum(np.where(cube[y] == veg_type, 1, 0), axis=1)
+            percentages[y] = np.true_divide(sums, cube.shape[2]).astype(np.float32)
+        splitext = os.path.splitext(basename)
+        filename = percent_dir + "/" + splitext[0] + "_" + str(veg_type) + splitext[1]
+        print(f"Writing results to {filename}", end="...", flush=True)
 
-    # TODO: Write percentage vegetation GeoTIFFs.
+        with rasterio.open(veg_list[0]) as rst:
+            arr = rst.read(1)
+            percentages[arr == 255] = -9999
+
+            meta = rasterio.open(veg_list[0]).meta
+            meta.update(
+                compress="lzw", dtype=np.float32, crs={"init": "EPSG:3338"}, nodata=-9999
+            )
+
+        with rasterio.open(filename, "w", **meta) as out:
+            out.write(percentages, 1)
 
     print(f"done, total time: {round((time.perf_counter() - tic) / 60, 1)}m")
 
