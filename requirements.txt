@@ -39,5 +39,5 @@ snuggs==1.4.1
 subprocess32==3.2.7
 tinydb==3.2.3
 traitlets==4.3.2
-ujson==1.35
+ujson==5.4.0
 wcwidth==0.1.7
