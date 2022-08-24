@@ -114,6 +114,13 @@ def relative_flammability(
         pass
 
     with rasterio.open(output_filename, "w", **meta) as out_rst:
+        tags = tmp_rst.tags()
+
+        # Replace replicate info with a more general description for aggregate
+        # GeoTIFFs.
+        tags['TIFFTAG_IMAGEDESCRIPTION'] = 'Values represent flammability of the pixel.'
+
+        out_rst.update_tags(**tags)
         out_rst.write(np.around(relative_flammability, 4), 1)
 
     return output_filename
