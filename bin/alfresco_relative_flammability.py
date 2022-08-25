@@ -125,7 +125,7 @@ def relative_flammability(
 
         # Replace replicate info with a more general description for aggregate
         # GeoTIFFs.
-        tags["TIFFTAG_IMAGEDESCRIPTION"] = "Values represent flammability of the pixel."
+        tags["TIFFTAG_IMAGEDESCRIPTION"] = "Values represent flammability."
 
         out_rst.update_tags(**tags)
         out_rst.write(np.around(relative_flammability, 4), 1)
