@@ -1,6 +1,7 @@
 import argparse
 import glob
 import os
+import re
 import time
 from itertools import groupby
 import rasterio
@@ -89,7 +90,8 @@ def main(args):
         arr = rst.read(1)
         mode_grid[arr == 255] = -9999
 
-    meta = rasterio.open(veg_list[0]).meta
+    veg_example = rasterio.open(veg_list[0])
+    meta = veg_example.meta
     meta.update(
         compress="lzw", dtype=np.float32, crs={"init": "EPSG:3338"}, nodata=-9999
     )
@@ -105,8 +107,22 @@ def main(args):
     basename = os.path.basename(args.output_filename)
     filename = mode_dir + "/" + basename
 
+    mode_tags = veg_example.tags()
+    percent_tags = veg_example.tags()
+
+    # Remove replicate information from aggregate GeoTIFFs, but preserve the
+    # value index substring as-is for mode GeoTIFFs.
+    description = mode_tags["TIFFTAG_IMAGEDESCRIPTION"]
+    value_index_string = re.search(r"Value Index:.*", description).group()
+    mode_tags["TIFFTAG_IMAGEDESCRIPTION"] = value_index_string
+
+    # Turn value index string into lookup dict for percent GeoTIFFs.
+    matches = re.findall(r"([0-9]+)\=([\w/ ]+)", value_index_string)
+    veg_type_lu = dict(matches)
+
     print(f"Writing results to {filename}", end="...", flush=True)
     with rasterio.open(filename, "w", **meta) as out:
+        out.update_tags(**mode_tags)
         out.write(mode_grid, 1)
 
     # Create list of eight 2D arrays, one 2D array for each vegetation type.
@@ -126,13 +142,21 @@ def main(args):
 
             meta = rasterio.open(veg_list[0]).meta
             meta.update(
-                compress="lzw", dtype=np.float32, crs={"init": "EPSG:3338"}, nodata=-9999
+                compress="lzw",
+                dtype=np.float32,
+                crs={"init": "EPSG:3338"},
+                nodata=-9999,
             )
 
+        veg_label = veg_type_lu[str(veg_type)]
+        description = "Values represent the likelihood of {}.".format(veg_label)
+        percent_tags["TIFFTAG_IMAGEDESCRIPTION"] = description
         with rasterio.open(filename, "w", **meta) as out:
+            out.update_tags(**percent_tags)
             out.write(percentages, 1)
 
     print(f"done, total time: {round((time.perf_counter() - tic) / 60, 1)}m")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

@@ -4,8 +4,9 @@ Note - this script relies on a specific file organization structure
 
 import argparse
 import os
+
 # potential fix for "OpenBLAS blas_thread_init: pthread_create failed for thread . of 64: Resource temporarily unavailable" warnings
-os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
 import time
 import multiprocessing as mp
 from functools import partial
@@ -38,15 +39,16 @@ def run_group(group):
 
 def chunk_groups(group_list, n=50):
     """Split a list of filepath groups into smaller groups"""
+
     def chunk(l, n):
         # looping till length l
-        for i in range(0, len(l), n): 
-            yield l[i:i + n]
+        for i in range(0, len(l), n):
+            yield l[i : i + n]
 
     new_groups = []
     for group in group_list:
         new_groups.extend(chunk(group, n))
-        
+
     return new_groups
 
 
@@ -55,7 +57,7 @@ def sum_firescars(firescar_list, ncores):
     firescar_series = pd.Series(firescar_list)
     repgrouper = firescar_series.apply(get_repnum)
     firescar_groups = [j.tolist() for i, j in firescar_series.groupby(repgrouper)]
-    
+
     # Pool.map() is locking up with larger groups for some reason,
     # try splitting into smaller groups to improve success
     if len(firescar_groups[0]) > 50:
@@ -72,7 +74,12 @@ def sum_firescars(firescar_list, ncores):
 
 
 def relative_flammability(
-    firescar_list, output_filename, mask_arr, mask_value, ncores, crs=None,
+    firescar_list,
+    output_filename,
+    mask_arr,
+    mask_value,
+    ncores,
+    crs=None,
 ):
     """
     run relative flammability.
@@ -114,6 +121,13 @@ def relative_flammability(
         pass
 
     with rasterio.open(output_filename, "w", **meta) as out_rst:
+        tags = tmp_rst.tags()
+
+        # Replace replicate info with a more general description for aggregate
+        # GeoTIFFs.
+        tags["TIFFTAG_IMAGEDESCRIPTION"] = "Values represent flammability."
+
+        out_rst.update_tags(**tags)
         out_rst.write(np.around(relative_flammability, 4), 1)
 
     return output_filename
@@ -126,10 +140,10 @@ if __name__ == "__main__":
     # ncores = 32
     # begin_year = 1900
     # end_year = 1999
-    
+
     # track time
     tic = time.perf_counter()
-    
+
     parser = argparse.ArgumentParser(
         description="program to calculate Relative Flammability from ALFRESCO"
     )
@@ -218,6 +232,6 @@ if __name__ == "__main__":
         ncores,
         crs={"init": "epsg:3338"},
     )
-    
+
     print(f"Relative flammability computed, results written to {output_filename}")
     print(f"Elapsed time: {round((time.perf_counter() - tic) / 60, 1)}m")
