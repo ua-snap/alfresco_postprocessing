@@ -8,7 +8,6 @@ import rasterio
 import numpy as np
 from pathos.mp_map import mp_map
 from scipy import stats
-from rasterio.enums import ColorInterp
 
 
 def get_rep_num(x):
