@@ -83,17 +83,20 @@ def main(args):
     mode_results = stats.mode(cube, axis=2)
     mode_grid = np.asarray(mode_results[0])
     mode_grid = mode_grid.reshape(mode_grid.shape[0], -1)
-    mode_grid = mode_grid.astype(np.float32)
-
-    # Mask the data with the out-of-bounds (255).
-    with rasterio.open(veg_list[0]) as rst:
-        arr = rst.read(1)
-        mode_grid[arr == 255] = -9999
+    mode_grid = mode_grid.astype(np.uint8)
 
     veg_example = rasterio.open(veg_list[0])
-    meta = veg_example.meta
-    meta.update(
-        compress="lzw", dtype=np.float32, crs={"init": "EPSG:3338"}, nodata=-9999
+
+    mode_meta = veg_example.meta
+    percent_meta = veg_example.meta
+
+    # Use uint8 data type for vegetation mode GeoTIFFs to preserve color map.
+    mode_meta.update(
+        compress="lzw", dtype=np.uint8, crs={"init": "EPSG:3338"}, nodata=255
+    )
+
+    percent_meta.update(
+        compress="lzw", dtype=np.float32, crs={"init": "EPSG:3338"}, nodata=-9999, count=9
     )
 
     dirname = os.path.dirname(args.output_filename)
@@ -105,7 +108,7 @@ def main(args):
             os.mkdir(dir)
 
     basename = os.path.basename(args.output_filename)
-    filename = mode_dir + "/" + basename
+    filename = mode_dir + "/Mode_" + basename
 
     mode_tags = veg_example.tags()
     percent_tags = veg_example.tags()
@@ -113,47 +116,47 @@ def main(args):
     # Remove replicate information from aggregate GeoTIFFs, but preserve the
     # value index substring as-is for mode GeoTIFFs.
     description = mode_tags["TIFFTAG_IMAGEDESCRIPTION"]
-    value_index_string = re.search(r"Value Index:.*", description).group()
-    mode_tags["TIFFTAG_IMAGEDESCRIPTION"] = value_index_string
+    value_index = re.search(r"Value Index:.*", description).group()
+    mode_tags["TIFFTAG_IMAGEDESCRIPTION"] = value_index
 
-    # Turn value index string into lookup dict for percent GeoTIFFs.
-    matches = re.findall(r"([0-9]+)\=([\w/ ]+)", value_index_string)
+    # Value index becomes the band index for percentage GeoTIFFs
+    # Need to shift index by 1 since GeoTIFFs start with band 1, not 0
+    matches = re.findall(r"([0-9]+)\=([\w/ ]+)", value_index)
     veg_type_lu = dict(matches)
+    band_index = "Band Index: "
+    for index, (key, value) in enumerate(veg_type_lu.items()):
+        new_key= int(key) + 1
+        band_index += str(new_key) + "=" + veg_type_lu[key]
+        if index < len(veg_type_lu) - 1:
+            band_index += ", "
+    percent_description = "Values represent percentage of vegetation type. "
+    percent_tags["TIFFTAG_IMAGEDESCRIPTION"] = percent_description + band_index
 
     print(f"Writing results to {filename}", end="...", flush=True)
-    with rasterio.open(filename, "w", **meta) as out:
+    with rasterio.open(filename, "w", **mode_meta) as out:
         out.update_tags(**mode_tags)
+        out.write_colormap(1, veg_example.colormap(1))
         out.write(mode_grid, 1)
 
-    # Create list of eight 2D arrays, one 2D array for each vegetation type.
-    # Each 2D array is x, y, and percentage presence of that vegetation type.
-    percentages = np.zeros((cube.shape[0], cube.shape[1]), dtype=np.float32)
-    for veg_type in range(0, 9):
-        for y in range(cube.shape[0]):
-            sums = np.sum(np.where(cube[y] == veg_type, 1, 0), axis=1)
-            percentages[y] = np.true_divide(sums, cube.shape[2]).astype(np.float32)
-        splitext = os.path.splitext(basename)
-        filename = percent_dir + "/" + splitext[0] + "_" + str(veg_type) + splitext[1]
-        print(f"Writing results to {filename}", end="...", flush=True)
+    filename = percent_dir + "/Percent_" + basename
+    with rasterio.open(filename, "w", **percent_meta) as out:
+        out.update_tags(**percent_tags)
+        for veg_type in range(0, 9):
+            # Create empty x, y array to store percentage of vegetation type.
+            percentages = np.zeros((cube.shape[0], cube.shape[1]), dtype=np.float32)
 
-        with rasterio.open(veg_list[0]) as rst:
-            arr = rst.read(1)
-            percentages[arr == 255] = -9999
+            # Calculate one row at a time to avoid overloading memory.
+            for y in range(cube.shape[0]):
+                sums = np.sum(np.where(cube[y] == veg_type, 1, 0), axis=1)
+                percentages[y] = np.true_divide(sums, cube.shape[2]).astype(np.float32) * 100
 
-            meta = rasterio.open(veg_list[0]).meta
-            meta.update(
-                compress="lzw",
-                dtype=np.float32,
-                crs={"init": "EPSG:3338"},
-                nodata=-9999,
-            )
+            print(f"Writing results to band {veg_type} of {filename}", end="...", flush=True)
 
-        veg_label = veg_type_lu[str(veg_type)]
-        description = "Values represent the likelihood of {}.".format(veg_label)
-        percent_tags["TIFFTAG_IMAGEDESCRIPTION"] = description
-        with rasterio.open(filename, "w", **meta) as out:
-            out.update_tags(**percent_tags)
-            out.write(percentages, 1)
+            with rasterio.open(veg_list[0]) as rst:
+                arr = rst.read(1)
+                percentages[arr == 255] = -9999
+                band = veg_type + 1
+                out.write(percentages, band)
 
     print(f"done, total time: {round((time.perf_counter() - tic) / 60, 1)}m")
 
