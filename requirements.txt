@@ -11,7 +11,7 @@ enum34==1.1.6
 Fiona==1.7.5
 functools32==3.2.3.post2
 geopandas==0.2.1
-ipython==7.16.3
+ipython==8.10.0
 ipython-genutils==0.2.0
 matplotlib==2.0.0
 munch==2.1.1
